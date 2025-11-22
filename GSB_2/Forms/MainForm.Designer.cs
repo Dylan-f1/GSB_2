@@ -24,5 +24,8 @@
         private Button buttonLogin;
         private TextBox textBoxLoginEmail;
         private TextBox textBoxLoginPassword;
+        private Label label1;
+        private Label label2;
+        private Label label3;
     }
 }

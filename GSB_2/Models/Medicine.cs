@@ -12,10 +12,10 @@ namespace GSB_2.Models
         // à notre attribut de classe via les méthodes get et set
         public int Id { get; set; }
         public int IdUser { get; set; }
-        public string dosage { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public string molecule { get; set; }
+        public string Dosage { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Molecule { get; set; }
 
         //ceci est le constructeur par défaut,
         //il permet de créer l'instance qui nous permettra d'accéder
@@ -23,14 +23,14 @@ namespace GSB_2.Models
         public Medicine(int v) { }
         //ceci est une surcharge du constructeur, elle permettra la création d'objet User
         // ceci sera instancié avec les variables passées en paramètres
-        public Medicine(int id_medicine, int id_user, string dosage, string name, string description, string molecule)
+        public Medicine(int id_medicine, int id_users, string dosage, string name, string description, string molecule)
         {
             this.Id = id_medicine;
-            this.IdUser = id_user;
-            this.dosage = dosage;
-            this.name = name;
-            this.description = description;
-            this.molecule = molecule;
+            this.IdUser = id_users;
+            this.Dosage = dosage;
+            this.Name = name;
+            this.Description = description;
+            this.Molecule = molecule;
         }
     }
 }

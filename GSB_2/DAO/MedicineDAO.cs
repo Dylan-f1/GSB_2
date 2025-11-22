@@ -18,7 +18,7 @@ namespace GSB_2.DAO
         {
             if (userRole) return false; //si True (1) alors interdit
 
-            using(var connection = db.GetConnection()) 
+            using (var connection = db.GetConnection())
             {
                 try
                 {
@@ -56,26 +56,26 @@ namespace GSB_2.DAO
                 {
                     connection.Open();
 
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                        myCommand.CommandText = @"UPDATE medicine 
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"UPDATE medicine 
                                                                SET id_users = @id_users, 
                                                                    name = @name, 
                                                                    description = @description, 
                                                                    molecule = @molecule, 
                                                                    dosage = @dosage
                                                                WHERE id = @id)";
-                    
-                        myCommand.Parameters.AddWithValue("@id", id);
-                        myCommand.Parameters.AddWithValue("@id_users", id_user);
-                        myCommand.Parameters.AddWithValue("@name", name);
-                        myCommand.Parameters.AddWithValue("@description", description);
-                        myCommand.Parameters.AddWithValue("@molecule", molecule);
-                        myCommand.Parameters.AddWithValue("@dosage", dosage);
 
-                        int rowsAffected = myCommand.ExecuteNonQuery();
-                        return rowsAffected > 0;
-                    
+                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id_users", id_user);
+                    myCommand.Parameters.AddWithValue("@name", name);
+                    myCommand.Parameters.AddWithValue("@description", description);
+                    myCommand.Parameters.AddWithValue("@molecule", molecule);
+                    myCommand.Parameters.AddWithValue("@dosage", dosage);
+
+                    int rowsAffected = myCommand.ExecuteNonQuery();
+                    return rowsAffected > 0;
+
                 }
                 catch (Exception ex)
                 {
@@ -95,15 +95,14 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                        myCommand.CommandText = @"DELETE FROM Medicine 
-                                                               WHERE id = @id)";
-                        myCommand.Parameters.AddWithValue("@id", id);
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"DELETE FROM Medicine WHERE id = @id)";
+                    myCommand.Parameters.AddWithValue("@id", id);
 
-                        int rowsAffected = myCommand.ExecuteNonQuery();
-                        return rowsAffected > 0; 
-                    
+                    int rowsAffected = myCommand.ExecuteNonQuery();
+                    return rowsAffected > 0;
+
                 }
                 catch (Exception ex)
                 {
@@ -116,41 +115,37 @@ namespace GSB_2.DAO
         public List<Medicine> GetAll()
         {
             List<Medicine> listMedicine = new List<Medicine>();
-
             using (var connection = db.GetConnection())
             {
-
                 try
                 {
                     connection.Open();
 
                     using (var myCommand = new MySqlCommand(@"SELECT * FROM Medicine;", connection))
                     {
-
                         using (var myReader = myCommand.ExecuteReader())
                         {
                             while (myReader.Read())
                             {
                                 Medicine medicine = new Medicine(
-                                    myReader.GetInt32("id_medicine"), 
-                                    myReader.GetInt32("id_user"), 
-                                    myReader.GetString("dosage"), 
-                                    myReader.GetString("name"), 
-                                    myReader.GetString("description"), 
+                                    myReader.GetInt32("id_medicine"),
+                                    myReader.GetInt32("id_users"),
+                                    myReader.GetString("dosage"),
+                                    myReader.GetString("name"),
+                                    myReader.GetString("description"),
                                     myReader.GetString("molecule"));
                                 listMedicine.Add(medicine);
                             }
                         }
                     }
-
-                    return listMedicine;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erreur lors de la connexion : {ex.Message}");
-                    return null;
+                    MessageBox.Show($"Erreur: {ex.Message}", "Erreur de base de données",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            return listMedicine;
         }
     }
 }

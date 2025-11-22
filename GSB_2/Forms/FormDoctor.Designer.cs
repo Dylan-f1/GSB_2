@@ -35,10 +35,10 @@
             // dataGridViewDoctorListMedicine
             // 
             dataGridViewDoctorListMedicine.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewDoctorListMedicine.Location = new Point(39, 32);
+            dataGridViewDoctorListMedicine.Location = new Point(423, 12);
             dataGridViewDoctorListMedicine.Name = "dataGridViewDoctorListMedicine";
             dataGridViewDoctorListMedicine.RowHeadersWidth = 51;
-            dataGridViewDoctorListMedicine.Size = new Size(725, 381);
+            dataGridViewDoctorListMedicine.Size = new Size(365, 245);
             dataGridViewDoctorListMedicine.TabIndex = 0;
             // 
             // FormDoctor

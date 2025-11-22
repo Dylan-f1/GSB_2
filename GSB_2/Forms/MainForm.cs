@@ -26,26 +26,41 @@ namespace GSB_2.Forms
         private void InitializeComponent()
         {
             groupBoxLogin = new GroupBox();
+            label1 = new Label();
             textBoxLoginPassword = new TextBox();
             textBoxLoginEmail = new TextBox();
             buttonLogin = new Button();
+            label2 = new Label();
+            label3 = new Label();
             groupBoxLogin.SuspendLayout();
             SuspendLayout();
             // 
             // groupBoxLogin
             // 
+            groupBoxLogin.Controls.Add(label3);
+            groupBoxLogin.Controls.Add(label2);
+            groupBoxLogin.Controls.Add(label1);
             groupBoxLogin.Controls.Add(textBoxLoginPassword);
             groupBoxLogin.Controls.Add(textBoxLoginEmail);
             groupBoxLogin.Controls.Add(buttonLogin);
-            groupBoxLogin.Location = new Point(191, 128);
+            groupBoxLogin.Location = new Point(191, 41);
             groupBoxLogin.Name = "groupBoxLogin";
-            groupBoxLogin.Size = new Size(340, 230);
+            groupBoxLogin.Size = new Size(340, 317);
             groupBoxLogin.TabIndex = 0;
             groupBoxLogin.TabStop = false;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(66, 177);
+            label1.Name = "label1";
+            label1.Size = new Size(77, 20);
+            label1.TabIndex = 3;
+            label1.Text = "Password :";
+            // 
             // textBoxLoginPassword
             // 
-            textBoxLoginPassword.Location = new Point(66, 119);
+            textBoxLoginPassword.Location = new Point(66, 200);
             textBoxLoginPassword.Name = "textBoxLoginPassword";
             textBoxLoginPassword.Size = new Size(201, 27);
             textBoxLoginPassword.TabIndex = 2;
@@ -53,20 +68,38 @@ namespace GSB_2.Forms
             // 
             // textBoxLoginEmail
             // 
-            textBoxLoginEmail.Location = new Point(66, 56);
+            textBoxLoginEmail.Location = new Point(66, 115);
             textBoxLoginEmail.Name = "textBoxLoginEmail";
             textBoxLoginEmail.Size = new Size(201, 27);
             textBoxLoginEmail.TabIndex = 1;
             // 
             // buttonLogin
             // 
-            buttonLogin.Location = new Point(117, 180);
+            buttonLogin.Location = new Point(113, 249);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(94, 29);
             buttonLogin.TabIndex = 0;
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
             buttonLogin.Click += buttonLogin_Click;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(66, 92);
+            label2.Name = "label2";
+            label2.Size = new Size(82, 20);
+            label2.TabIndex = 4;
+            label2.Text = "Username :";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(138, 23);
+            label3.Name = "label3";
+            label3.Size = new Size(46, 20);
+            label3.TabIndex = 10;
+            label3.Text = "Login";
             // 
             // MainForm
             // 
