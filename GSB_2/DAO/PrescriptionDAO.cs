@@ -115,7 +115,7 @@ namespace GSB_2.DAO
         }
 
         // READ ALL - Récupérer toutes les prescriptions
-        public List<Prescription> getAllPrescriptions()
+        public List<Prescription> getAllPrescription()
         {
             List<Prescription> prescriptions = new List<Prescription>();
 
@@ -153,7 +153,7 @@ namespace GSB_2.DAO
             return prescriptions;
         }
         // READ - Récupérer les prescriptions d'un patient
-        public List<Prescription> getPrescriptionsByPatientId(int id_patients)
+        public List<Prescription> getPrescriptionByPatientId(int id_patients)
         {
             List<Prescription> prescriptions = new List<Prescription>();
 
