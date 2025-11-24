@@ -62,6 +62,7 @@
             buttonAdminAdd.TabIndex = 1;
             buttonAdminAdd.Text = "Add";
             buttonAdminAdd.UseVisualStyleBackColor = true;
+            buttonAdminAdd.Click += buttonAdminAdd_Click;
             // 
             // buttonAdminDelete
             // 
@@ -71,6 +72,7 @@
             buttonAdminDelete.TabIndex = 2;
             buttonAdminDelete.Text = "Delete";
             buttonAdminDelete.UseVisualStyleBackColor = true;
+            buttonAdminDelete.Click += buttonAdminDelete_Click;
             // 
             // textBoxAdminFirstname
             // 

@@ -16,9 +16,13 @@ namespace GSB_2.Forms
 {
     public partial class FormDoctor : Form
     {
-        public FormDoctor()
+        private int currentUserId;
+
+        // ✅ UN SEUL CONSTRUCTEUR
+        public FormDoctor(int userId)
         {
             InitializeComponent();
+            this.currentUserId = userId;
             SetupLayout();
         }
 
@@ -54,7 +58,7 @@ namespace GSB_2.Forms
 
             // Boutons du menu
             Button btnPrescriptions = CreateMenuButton("📋 Prescriptions", 70);
-            btnPrescriptions.Click += (s, e) => LoadContent(new PrescriptionControl());
+            btnPrescriptions.Click += (s, e) => LoadContent(new PrescriptionControl(currentUserId)); // ✅ Utilisez currentUserId
             SidePanel.Controls.Add(btnPrescriptions);
 
             Button btnMedicines = CreateMenuButton("💊 Médicaments", 120);
@@ -96,7 +100,7 @@ namespace GSB_2.Forms
             this.Controls.Add(ContentPanel);
 
             // Charger le contenu par défaut (Prescriptions)
-            LoadContent(new PrescriptionControl());
+            LoadContent(new PrescriptionControl(currentUserId)); // ✅ Utilisez currentUserId
         }
 
         private Button CreateMenuButton(string text, int yPosition)
@@ -124,7 +128,6 @@ namespace GSB_2.Forms
 
             return btn;
         }
-
         private void LoadContent(UserControl control)
         {
             // Vider le panel de contenu

@@ -113,30 +113,47 @@ namespace GSB_2.Forms
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            SHA256 sha256 = SHA256.Create();
-            byte[] hashValue = sha256.ComputeHash(Encoding.UTF8.GetBytes(this.textBoxLoginPassword.Text));
-            string hashString = BitConverter.ToString(hashValue).Replace("-", "").ToLowerInvariant();
-            string email = this.textBoxLoginEmail.Text;
-            UserDAO userDAO = new UserDAO();
-            User user = userDAO.Login(email, hashString);
-            if (user != null && user.Role == true)
+            try
             {
-                this.Hide();
-                FormAdmin formAdmin = new FormAdmin();
-                formAdmin.Show();
+                string email = this.textBoxLoginEmail.Text.Trim();
+                string password = this.textBoxLoginPassword.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    MessageBox.Show("Veuillez remplir tous les champs.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                UserDAO userDAO = new UserDAO();
+                User user = userDAO.Login(email, password);
+
+                if (user != null)
+                {
+                    this.Hide();
+
+                    if (user.Role == true) 
+                    {
+                        FormAdmin formAdmin = new FormAdmin();
+                        formAdmin.Show();
+                    }
+                    else 
+                    {
+                        FormDoctor formDoctor = new FormDoctor(user.Id); 
+                        formDoctor.Show();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Email ou mot de passe incorrect.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else if (user != null && user.Role == false)
+            catch (Exception ex)
             {
-                this.Hide();
-                FormDoctor formDoctor = new FormDoctor();
-                formDoctor.Show();
-            }
-            else
-            {
-                MessageBox.Show("Please retry an email and password.", "Error", MessageBoxButtons.OK);
+                MessageBox.Show($"Erreur de connexion : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
     }
 }
