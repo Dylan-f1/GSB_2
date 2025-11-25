@@ -26,12 +26,12 @@ namespace GSB_2.Forms
         private void InitializeComponent()
         {
             groupBoxLogin = new GroupBox();
+            label3 = new Label();
+            label2 = new Label();
             label1 = new Label();
             textBoxLoginPassword = new TextBox();
             textBoxLoginEmail = new TextBox();
             buttonLogin = new Button();
-            label2 = new Label();
-            label3 = new Label();
             groupBoxLogin.SuspendLayout();
             SuspendLayout();
             // 
@@ -48,6 +48,24 @@ namespace GSB_2.Forms
             groupBoxLogin.Size = new Size(340, 317);
             groupBoxLogin.TabIndex = 0;
             groupBoxLogin.TabStop = false;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(138, 23);
+            label3.Name = "label3";
+            label3.Size = new Size(46, 20);
+            label3.TabIndex = 10;
+            label3.Text = "Login";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(66, 92);
+            label2.Name = "label2";
+            label2.Size = new Size(53, 20);
+            label2.TabIndex = 4;
+            label2.Text = "Email :";
             // 
             // label1
             // 
@@ -82,24 +100,6 @@ namespace GSB_2.Forms
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
             buttonLogin.Click += buttonLogin_Click;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(66, 92);
-            label2.Name = "label2";
-            label2.Size = new Size(82, 20);
-            label2.TabIndex = 4;
-            label2.Text = "Username :";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(138, 23);
-            label3.Name = "label3";
-            label3.Size = new Size(46, 20);
-            label3.TabIndex = 10;
-            label3.Text = "Login";
             // 
             // MainForm
             // 

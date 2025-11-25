@@ -91,8 +91,8 @@ namespace GSB_2.Forms
                     0,
                     textBoxAdminFirstname.Text.Trim(),
                     textBoxAdminName.Text.Trim(),
-                    textBoxAdminPassword.Text.Trim(),
                     textBoxAdminEmail.Text.Trim(),
+                    textBoxAdminPassword.Text.Trim(),
                     roleValue
                 );
 

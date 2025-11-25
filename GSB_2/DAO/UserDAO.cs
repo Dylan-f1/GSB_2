@@ -13,7 +13,7 @@ namespace GSB_2.DAO
 {
     public class UserDAO
     {
-        private readonly Database db = new Database();        
+        private readonly Database db = new Database();
         public User Login(string email, string password)
         {
             using (var connection = db.GetConnection())
@@ -24,7 +24,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT * FROM Users WHERE email = @email AND password = @password;";
+                    myCommand.CommandText = @"SELECT * FROM Users WHERE email = @email AND password = SHA2(@password, 256);";
                     myCommand.Parameters.AddWithValue("@email", email);
                     myCommand.Parameters.AddWithValue("@password", password);
 
@@ -36,25 +36,24 @@ namespace GSB_2.DAO
                             string name = myReader.GetString("name");
                             string firstname = myReader.GetString("firstname");
                             bool role = myReader.GetBoolean("role");
-
-                            return new User(id, firstname, name, password, email, role);
+                            return new User(id, firstname, name, email, password, role);
                         }
                         else
                         {
+                            // 🔍 DEBUG 4 : Aucun utilisateur trouvé
+                            MessageBox.Show("Aucun utilisateur trouvé avec ces identifiants.", "Debug");
                             return null;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erreur lors de la connexion : {ex.Message}");
-                    MessageBox.Show($"Erreur de connexion: {ex.Message}", "Erreur",
-                                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // 🔍 DEBUG 5 : Erreur
+                    MessageBox.Show($"ERREUR :\n{ex.Message}\n\nStack:\n{ex.StackTrace}", "Debug Erreur");
                     return null;
                 }
             }
         }
-
         public List<User> GetAll()
         {
             List<User> listUser = new List<User>();
@@ -77,8 +76,8 @@ namespace GSB_2.DAO
                                     myReader.GetInt32("id_users"),
                                     myReader.GetString("firstname"),
                                     myReader.GetString("name"),
-                                    myReader.GetString("password"),
                                     myReader.GetString("email"),
+                                    myReader.GetString("password"),
                                     myReader.GetBoolean("role"));
                                 listUser.Add(user);
                             }
@@ -108,15 +107,15 @@ namespace GSB_2.DAO
                 {
                     connection.Open();
 
-                    string query = @"INSERT INTO Users (firstname, name, password, email, role) 
-                                   VALUES (@firstname, @name, @password, @email, @role)";
+                    string query = @"INSERT INTO Users (firstname, name, email, password, role) 
+                                   VALUES (@firstname, @name, @email, SHA2(@password, 256), @role)";
 
                     using (var myCommand = new MySqlCommand(query, connection))
                     {
                         myCommand.Parameters.AddWithValue("@firstname", user.Firstname);
                         myCommand.Parameters.AddWithValue("@name", user.Name);
-                        myCommand.Parameters.AddWithValue("@password", user.Password);
                         myCommand.Parameters.AddWithValue("@email", user.Email);
+                        myCommand.Parameters.AddWithValue("@password", user.Password);
                         myCommand.Parameters.AddWithValue("@role", user.Role);
 
                         int rowsAffected = myCommand.ExecuteNonQuery();
@@ -147,8 +146,8 @@ namespace GSB_2.DAO
                     string query = @"UPDATE Users 
                                    SET firstname = @firstname, 
                                        name = @name, 
+                                       email = @email,
                                        password = @password, 
-                                       email = @email, 
                                        role = @role 
                                    WHERE id_users = @id";
 
@@ -157,8 +156,8 @@ namespace GSB_2.DAO
                         myCommand.Parameters.AddWithValue("@id", user.Id);
                         myCommand.Parameters.AddWithValue("@firstname", user.Firstname);
                         myCommand.Parameters.AddWithValue("@name", user.Name);
-                        myCommand.Parameters.AddWithValue("@password", user.Password);
                         myCommand.Parameters.AddWithValue("@email", user.Email);
+                        myCommand.Parameters.AddWithValue("@password", user.Password);
                         myCommand.Parameters.AddWithValue("@role", user.Role);
 
                         int rowsAffected = myCommand.ExecuteNonQuery();
