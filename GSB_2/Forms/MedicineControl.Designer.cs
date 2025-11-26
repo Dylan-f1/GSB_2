@@ -35,10 +35,10 @@
             // dataGridViewListMedicine
             // 
             dataGridViewListMedicine.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewListMedicine.Location = new Point(204, 102);
+            dataGridViewListMedicine.Location = new Point(174, 17);
             dataGridViewListMedicine.Name = "dataGridViewListMedicine";
             dataGridViewListMedicine.RowHeadersWidth = 51;
-            dataGridViewListMedicine.Size = new Size(456, 297);
+            dataGridViewListMedicine.Size = new Size(503, 401);
             dataGridViewListMedicine.TabIndex = 1;
             // 
             // MedicineControl

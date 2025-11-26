@@ -95,21 +95,6 @@ namespace GSB_2.Forms
                     textBoxAdminPassword.Text.Trim(),
                     roleValue
                 );
-
-                bool result = userDAO.Add(newUser);
-
-                if (result)
-                {
-                    MessageBox.Show("Utilisateur ajouté avec succès !", "Succès",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    ClearFields();
-                    LoadUser();
-                }
-                else
-                {
-                    MessageBox.Show("Erreur lors de l'ajout de l'utilisateur.", "Erreur",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
             catch (Exception ex)
             {
@@ -135,24 +120,8 @@ namespace GSB_2.Forms
                     "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
                     "Confirmation",
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                {
-                    bool success = userDAO.Delete(id);
-
-                    if (success)
-                    {
-                        MessageBox.Show("Utilisateur supprimé avec succès !", "Succès",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadUser();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Erreur lors de la suppression.", "Erreur",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
+                    MessageBoxIcon.Question
+                );
             }
             catch (Exception ex)
             {
@@ -174,6 +143,28 @@ namespace GSB_2.Forms
             textBoxAdminPassword.Clear();
             comboBoxAdminRole.SelectedIndex = 0;
             textBoxAdminFirstname.Focus();
+        }
+
+        private void buttonFormAdminLogout_Click(object sender, EventArgs e)
+        {
+            Logout();
+        }
+
+        private void Logout()
+        {
+            var result = MessageBox.Show(
+                "Êtes-vous sûr de vouloir vous déconnecter ?",
+                "Confirmation",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                this.Hide();
+                MainForm loginForm = new MainForm();
+                loginForm.Show();
+            }
         }
     }
 }

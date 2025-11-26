@@ -37,6 +37,7 @@ namespace GSB_2.Forms
             // 
             // groupBoxLogin
             // 
+            groupBoxLogin.BackColor = SystemColors.ButtonFace;
             groupBoxLogin.Controls.Add(label3);
             groupBoxLogin.Controls.Add(label2);
             groupBoxLogin.Controls.Add(label1);
@@ -132,14 +133,16 @@ namespace GSB_2.Forms
                 {
                     this.Hide();
 
-                    if (user.Role == true) 
+                    if (user.Role == true)
                     {
                         FormAdmin formAdmin = new FormAdmin();
                         formAdmin.Show();
                     }
-                    else 
+                    else
                     {
-                        FormDoctor formDoctor = new FormDoctor(user.Id); 
+                        string userName = !string.IsNullOrEmpty(user.Name) ? user.Name : "Médecin";
+
+                        FormDoctor formDoctor = new FormDoctor(user.Id, userName);
                         formDoctor.Show();
                     }
                 }

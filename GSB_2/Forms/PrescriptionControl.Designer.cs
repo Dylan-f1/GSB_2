@@ -35,7 +35,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             Name = "PrescriptionControl";
-            Size = new Size(564, 374);
+            Size = new Size(704, 449);
             ResumeLayout(false);
         }
 

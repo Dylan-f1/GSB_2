@@ -42,6 +42,7 @@
             textBoxAdminPassword = new TextBox();
             labelAdminPassword = new Label();
             buttonAdminClear = new Button();
+            buttonFormAdminLogout = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewListUser).BeginInit();
             SuspendLayout();
             // 
@@ -166,11 +167,22 @@
             buttonAdminClear.UseVisualStyleBackColor = true;
             buttonAdminClear.Click += buttonAdminClear_Click;
             // 
+            // buttonFormAdminLogout
+            // 
+            buttonFormAdminLogout.Location = new Point(694, 12);
+            buttonFormAdminLogout.Name = "buttonFormAdminLogout";
+            buttonFormAdminLogout.Size = new Size(94, 29);
+            buttonFormAdminLogout.TabIndex = 14;
+            buttonFormAdminLogout.Text = "Logout";
+            buttonFormAdminLogout.UseVisualStyleBackColor = true;
+            buttonFormAdminLogout.Click += buttonFormAdminLogout_Click;
+            // 
             // FormAdmin
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(buttonFormAdminLogout);
             Controls.Add(buttonAdminClear);
             Controls.Add(labelAdminPassword);
             Controls.Add(textBoxAdminPassword);
@@ -208,5 +220,6 @@
         private TextBox textBoxAdminPassword;
         private Label labelAdminPassword;
         private Button buttonAdminClear;
+        private Button buttonFormAdminLogout;
     }
 }

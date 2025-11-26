@@ -1,141 +1,200 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using GSB_2.DAO;
-using GSB_2.Models;
-using Microsoft.VisualBasic.ApplicationServices;
+using GSB_2.Forms;
 
 namespace GSB_2.Forms
 {
     public partial class FormDoctor : Form
     {
+        private Panel sidePanel;
+        private Panel contentPanel;
+        private Button btnMedicines;
+        private Button btnPrescriptions;
+        private Button btnLogout;
+        private Label lblUserInfo;
         private int currentUserId;
+        private string currentUserName;
 
-        // ✅ UN SEUL CONSTRUCTEUR
-        public FormDoctor(int userId)
+        public FormDoctor(int userId, string userName)
         {
             InitializeComponent();
-            this.currentUserId = userId;
-            SetupLayout();
+            currentUserId = userId;
+            currentUserName = userName;
+            InitializeCustomComponents();
+
+            LoadUserControl(new MedicineControl());
         }
 
-        private void SetupLayout()
+        private void InitializeCustomComponents()
         {
-            // Configuration de la fenêtre
-            this.Text = "GSB - Espace Docteur";
+            // Configuration du formulaire principal
+            this.Text = "GSB - Espace Médecin";
             this.Size = new Size(1200, 700);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.White;
+            this.BackColor = Color.FromArgb(240, 240, 240);
 
-            // ===== PANEL LATÉRAL (MENU) =====
-            SidePanel = new Panel();
-            SidePanel.Dock = DockStyle.Left;
-            SidePanel.Width = 220;
-            SidePanel.BackColor = Color.FromArgb(45, 45, 48);
+            // ===== SIDE PANEL =====
+            sidePanel = new Panel();
+            sidePanel.Dock = DockStyle.Left;
+            sidePanel.Width = 220;
+            sidePanel.BackColor = Color.FromArgb(45, 45, 48);
+            this.Controls.Add(sidePanel);
 
-            // Titre du menu
-            Label menuTitle = new Label();
-            menuTitle.Text = "MENU DOCTEUR";
-            menuTitle.ForeColor = Color.White;
-            menuTitle.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-            menuTitle.Location = new Point(15, 20);
-            menuTitle.AutoSize = true;
-            SidePanel.Controls.Add(menuTitle);
+            // Logo/Titre de l'application
+            Label lblAppTitle = new Label();
+            lblAppTitle.Text = "GSB";
+            lblAppTitle.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+            lblAppTitle.ForeColor = Color.White;
+            lblAppTitle.Location = new Point(15, 20);
+            lblAppTitle.AutoSize = true;
+            sidePanel.Controls.Add(lblAppTitle);
+
+            // Informations utilisateur
+            lblUserInfo = new Label();
+            lblUserInfo.Text = $"👤 Dr. {currentUserName}";
+            lblUserInfo.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            lblUserInfo.ForeColor = Color.FromArgb(200, 200, 200);
+            lblUserInfo.Location = new Point(15, 60);
+            lblUserInfo.AutoSize = true;
+            sidePanel.Controls.Add(lblUserInfo);
 
             // Ligne de séparation
             Panel separator = new Panel();
-            separator.BackColor = Color.FromArgb(80, 80, 85);
-            separator.Location = new Point(10, 50);
+            separator.BackColor = Color.FromArgb(70, 70, 70);
+            separator.Location = new Point(10, 95);
             separator.Size = new Size(200, 2);
-            SidePanel.Controls.Add(separator);
+            sidePanel.Controls.Add(separator);
 
-            // Boutons du menu
-            Button btnPrescriptions = CreateMenuButton("📋 Prescriptions", 70);
-            btnPrescriptions.Click += (s, e) => LoadContent(new PrescriptionControl(currentUserId)); // ✅ Utilisez currentUserId
-            SidePanel.Controls.Add(btnPrescriptions);
+            // Bouton Médicaments
+            btnMedicines = CreateSideButton("💊 Médicaments", 110);
+            btnMedicines.Click += BtnMedicines_Click;
+            sidePanel.Controls.Add(btnMedicines);
 
-            Button btnMedicines = CreateMenuButton("💊 Médicaments", 120);
-            btnMedicines.Click += (s, e) => LoadContent(new MedicineControl());
-            SidePanel.Controls.Add(btnMedicines);
+            // Bouton Prescriptions
+            btnPrescriptions = CreateSideButton("📋 Prescriptions", 160);
+            btnPrescriptions.Click += BtnPrescriptions_Click;
+            sidePanel.Controls.Add(btnPrescriptions);
 
-            // Bouton déconnexion en bas
-            Button btnLogout = new Button();
-            btnLogout.Text = "Déconnexion";
-            btnLogout.Location = new Point(10, 600);
-            btnLogout.Size = new Size(200, 40);
-            btnLogout.FlatStyle = FlatStyle.Flat;
-            btnLogout.FlatAppearance.BorderSize = 0;
-            btnLogout.BackColor = Color.FromArgb(180, 40, 40);
-            btnLogout.ForeColor = Color.White;
-            btnLogout.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            btnLogout.TextAlign = ContentAlignment.MiddleLeft;
-            btnLogout.Cursor = Cursors.Hand;
-            btnLogout.Click += (s, e) => {
-                var result = MessageBox.Show("Voulez-vous vraiment vous déconnecter ?",
-                    "Déconnexion", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    this.Close();
-                }
-            };
+            // Ligne de séparation en bas
+            Panel separatorBottom = new Panel();
+            separatorBottom.BackColor = Color.FromArgb(70, 70, 70);
+            separatorBottom.Location = new Point(10, 580);
+            separatorBottom.Size = new Size(200, 2);
+            sidePanel.Controls.Add(separatorBottom);
 
-            btnLogout.MouseEnter += (s, e) => btnLogout.BackColor = Color.FromArgb(200, 60, 60);
-            btnLogout.MouseLeave += (s, e) => btnLogout.BackColor = Color.FromArgb(180, 40, 40);
+            // Bouton Déconnexion
+            btnLogout = CreateSideButton("Déconnexion", 595);
+            btnLogout.BackColor = Color.FromArgb(192, 57, 43);
+            btnLogout.Click += BtnLogout_Click;
+            sidePanel.Controls.Add(btnLogout);
 
-            SidePanel.Controls.Add(btnLogout);
+            // ===== CONTENT PANEL =====
+            contentPanel = new Panel();
+            contentPanel.Dock = DockStyle.Fill;
+            contentPanel.BackColor = Color.White;
+            contentPanel.Padding = new Padding(10);
+            this.Controls.Add(contentPanel);
 
-            this.Controls.Add(SidePanel);
-
-            // ===== PANEL DE CONTENU =====
-            ContentPanel = new Panel();
-            ContentPanel.Dock = DockStyle.Fill;
-            ContentPanel.BackColor = Color.White;
-            this.Controls.Add(ContentPanel);
-
-            // Charger le contenu par défaut (Prescriptions)
-            LoadContent(new PrescriptionControl(currentUserId)); // ✅ Utilisez currentUserId
+            // Sélectionner le premier bouton par défaut
+            SetActiveButton(btnMedicines);
         }
 
-        private Button CreateMenuButton(string text, int yPosition)
+        private Button CreateSideButton(string text, int yPosition)
         {
             Button btn = new Button();
             btn.Text = text;
             btn.Location = new Point(10, yPosition);
             btn.Size = new Size(200, 45);
+            btn.BackColor = Color.FromArgb(45, 45, 48);
+            btn.ForeColor = Color.White;
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
-            btn.BackColor = Color.FromArgb(60, 60, 65);
-            btn.ForeColor = Color.White;
-            btn.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            btn.Font = new Font("Segoe UI", 11, FontStyle.Regular);
             btn.TextAlign = ContentAlignment.MiddleLeft;
-            btn.Padding = new Padding(15, 0, 0, 0);
             btn.Cursor = Cursors.Hand;
+            btn.Padding = new Padding(15, 0, 0, 0);
 
             // Effet hover
             btn.MouseEnter += (s, e) => {
-                btn.BackColor = Color.FromArgb(0, 120, 215);
+                if (btn.BackColor != Color.FromArgb(0, 120, 215))
+                    btn.BackColor = Color.FromArgb(60, 60, 65);
             };
             btn.MouseLeave += (s, e) => {
-                btn.BackColor = Color.FromArgb(60, 60, 65);
+                if (btn.BackColor != Color.FromArgb(0, 120, 215))
+                    btn.BackColor = Color.FromArgb(45, 45, 48);
             };
 
             return btn;
         }
-        private void LoadContent(UserControl control)
+
+        private void SetActiveButton(Button activeButton)
         {
-            // Vider le panel de contenu
-            ContentPanel.Controls.Clear();
+            // Réinitialiser tous les boutons (sauf déconnexion)
+            btnMedicines.BackColor = Color.FromArgb(45, 45, 48);
+            btnPrescriptions.BackColor = Color.FromArgb(45, 45, 48);
+
+            // Mettre en surbrillance le bouton actif
+            activeButton.BackColor = Color.FromArgb(0, 120, 215);
+        }
+
+        private void LoadUserControl(UserControl userControl)
+        {
+            // Nettoyer le contentPanel
+            contentPanel.Controls.Clear();
 
             // Ajouter le nouveau UserControl
-            control.Dock = DockStyle.Fill;
-            ContentPanel.Controls.Add(control);
+            userControl.Dock = DockStyle.Fill;
+            contentPanel.Controls.Add(userControl);
+        }
+
+        private void BtnMedicines_Click(object sender, EventArgs e)
+        {
+            SetActiveButton(btnMedicines);
+            LoadUserControl(new MedicineControl());
+        }
+
+        private void BtnPrescriptions_Click(object sender, EventArgs e)
+        {
+            SetActiveButton(btnPrescriptions);
+            LoadUserControl(new PrescriptionControl(currentUserId));
+        }
+
+        private void BtnLogout_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "Êtes-vous sûr de vouloir vous déconnecter ?",
+                "Confirmation",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                this.Hide();
+                MainForm loginForm = new MainForm();
+                loginForm.Show();
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                var result = MessageBox.Show(
+                    "Voulez-vous vraiment quitter l'application ?",
+                    "Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }
