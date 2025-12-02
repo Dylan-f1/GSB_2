@@ -13,6 +13,7 @@ namespace GSB_2.DAO
     internal class PrescriptionDAO
     {
         private readonly Database db = new Database();
+        // CREATE - Créer une prescription
         public bool createPrescription(int id_users, int id_patients, int quantity, DateTime validity, bool userRole)
         {
             if (userRole) return false; // Si True (1) alors interdit

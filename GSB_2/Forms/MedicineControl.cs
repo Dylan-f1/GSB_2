@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GSB_2.DAO;
-
 namespace GSB_2.Forms
 {
     public partial class MedicineControl : UserControl
@@ -24,7 +23,6 @@ namespace GSB_2.Forms
             // Configuration du UserControl
             this.BackColor = Color.White;
             this.Dock = DockStyle.Fill;
-
             // Titre
             Label lblTitle = new Label();
             lblTitle.Text = "Liste des Médicaments";
@@ -32,7 +30,6 @@ namespace GSB_2.Forms
             lblTitle.Location = new Point(20, 20);
             lblTitle.AutoSize = true;
             this.Controls.Add(lblTitle);
-
             // DataGridView
             dataGridViewListMedicine = new DataGridView();
             dataGridViewListMedicine.Location = new Point(20, 70);
@@ -43,12 +40,10 @@ namespace GSB_2.Forms
             dataGridViewListMedicine.AllowUserToAddRows = false;
             this.Controls.Add(dataGridViewListMedicine);
         }
-
         private void LoadMedicines()
         {
             MedicineDAO medDAO = new MedicineDAO();
             var medList = medDAO.GetAll();
-
             var displayList = medList.Select(m => new
             {
                 Id = m.Id,
@@ -57,7 +52,6 @@ namespace GSB_2.Forms
                 Dosage = m.Dosage,
                 Description = m.Description
             }).ToList();
-
             this.dataGridViewListMedicine.DataSource = displayList;
             this.dataGridViewListMedicine.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }

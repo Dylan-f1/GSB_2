@@ -29,25 +29,15 @@
         private void InitializeComponent()
         {
             ContentPanel = new Panel();
-            SidePanel = new Panel();
-            ContentPanel.SuspendLayout();
             SuspendLayout();
             // 
             // ContentPanel
             // 
-            ContentPanel.Controls.Add(SidePanel);
             ContentPanel.Dock = DockStyle.Fill;
             ContentPanel.Location = new Point(0, 0);
             ContentPanel.Name = "ContentPanel";
             ContentPanel.Size = new Size(800, 450);
             ContentPanel.TabIndex = 2;
-            // 
-            // SidePanel
-            // 
-            SidePanel.Location = new Point(0, 0);
-            SidePanel.Name = "SidePanel";
-            SidePanel.Size = new Size(144, 450);
-            SidePanel.TabIndex = 0;
             // 
             // FormDoctor
             // 
@@ -57,12 +47,13 @@
             Controls.Add(ContentPanel);
             Name = "FormDoctor";
             Text = "FormDoctor";
-            ContentPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
         private Panel ContentPanel;
         private Panel SidePanel;
+        private Button button1;
+        private Button BtnPrescriptions;
     }
 }

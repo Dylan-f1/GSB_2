@@ -41,9 +41,19 @@ namespace GSB_2.Forms
             sidePanel.BackColor = Color.FromArgb(45, 45, 48);
             this.Controls.Add(sidePanel);
 
+            // ===== CONTENT PANEL =====
+            contentPanel = new Panel();
+            contentPanel.Dock = DockStyle.Fill;
+            contentPanel.BackColor = Color.White;
+            contentPanel.Padding = new Padding(10);
+            contentPanel.Visible = true;
+
+            this.Controls.Add(contentPanel);
+            this.Controls.Add(sidePanel);
+
             // Logo/Titre de l'application
             Label lblAppTitle = new Label();
-            lblAppTitle.Text = "GSB";
+            lblAppTitle.Text = "GSB";   
             lblAppTitle.Font = new Font("Segoe UI", 16, FontStyle.Bold);
             lblAppTitle.ForeColor = Color.White;
             lblAppTitle.Location = new Point(15, 20);
@@ -88,16 +98,6 @@ namespace GSB_2.Forms
             btnLogout.BackColor = Color.FromArgb(192, 57, 43);
             btnLogout.Click += BtnLogout_Click;
             sidePanel.Controls.Add(btnLogout);
-
-            // ===== CONTENT PANEL =====
-            contentPanel = new Panel();
-            contentPanel.Dock = DockStyle.Fill;
-            contentPanel.BackColor = Color.White;
-            contentPanel.Padding = new Padding(10);
-            this.Controls.Add(contentPanel);
-
-            // Sélectionner le premier bouton par défaut
-            SetActiveButton(btnMedicines);
         }
 
         private Button CreateSideButton(string text, int yPosition)
@@ -128,35 +128,36 @@ namespace GSB_2.Forms
             return btn;
         }
 
-        private void SetActiveButton(Button activeButton)
-        {
-            // Réinitialiser tous les boutons (sauf déconnexion)
-            btnMedicines.BackColor = Color.FromArgb(45, 45, 48);
-            btnPrescriptions.BackColor = Color.FromArgb(45, 45, 48);
-
-            // Mettre en surbrillance le bouton actif
-            activeButton.BackColor = Color.FromArgb(0, 120, 215);
-        }
 
         private void LoadUserControl(UserControl userControl)
         {
-            // Nettoyer le contentPanel
-            contentPanel.Controls.Clear();
+            try
+            {
+                // Nettoyer le contentPanel
+                contentPanel.Controls.Clear();
 
-            // Ajouter le nouveau UserControl
-            userControl.Dock = DockStyle.Fill;
-            contentPanel.Controls.Add(userControl);
+                // Ajouter le nouveau UserControl
+                userControl.Dock = DockStyle.Fill;
+                userControl.Visible = true;
+                contentPanel.Controls.Add(userControl);
+
+               
+                userControl.BringToFront();
+                contentPanel.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         private void BtnMedicines_Click(object sender, EventArgs e)
         {
-            SetActiveButton(btnMedicines);
             LoadUserControl(new MedicineControl());
         }
 
         private void BtnPrescriptions_Click(object sender, EventArgs e)
         {
-            SetActiveButton(btnPrescriptions);
             LoadUserControl(new PrescriptionControl(currentUserId));
         }
 
