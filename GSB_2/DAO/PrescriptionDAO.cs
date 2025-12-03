@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using GSB_2.Models;
 using GSB2.DAO;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace GSB_2.DAO
 {
-    internal class PrescriptionDAO
+    public class PrescriptionDAO
     {
         private readonly Database db = new Database();
+
         // CREATE - Créer une prescription
-        public bool createPrescription(int id_users, int id_patients, int quantity, DateTime validity, bool userRole)
+        public bool createPrescription(int id_user, int id_patient, DateTime validity, bool userRole)
         {
             if (userRole) return false; // Si True (1) alors interdit
 
@@ -23,19 +23,18 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                    myCommand.CommandText = @"INSERT INTO Prescription (id_users, id_patients, quantity, validity)
-                                                                   VALUES (@id_users, @id_patients, @quantity, @validity)";
-                    
-                        myCommand.Parameters.AddWithValue("@id_users", id_users);
-                        myCommand.Parameters.AddWithValue("@id_patients", id_patients);
-                        myCommand.Parameters.AddWithValue("@quantity", quantity);
-                        myCommand.Parameters.AddWithValue("@validity", validity.ToString("yyyy-MM-dd"));
 
-                        myCommand.ExecuteNonQuery();
-                        return true;
-                    
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"INSERT INTO Prescription (id_user, id_patient, validity)
+                                            VALUES (@id_user, @id_patient, @validity)";
+
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+                    myCommand.Parameters.AddWithValue("@id_patient", id_patient);
+                    myCommand.Parameters.AddWithValue("@validity", validity.ToString("yyyy-MM-dd"));
+
+                    myCommand.ExecuteNonQuery();
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -46,7 +45,7 @@ namespace GSB_2.DAO
         }
 
         // UPDATE - Mettre à jour une prescription
-        public bool updatePrescription(int id_prescription, int id_users, int id_patients, int quantity, DateTime validity, bool userRole)
+        public bool updatePrescription(int id_prescription, int id_user, int id_patient, DateTime validity, bool userRole)
         {
             if (userRole) return false; // Si True (1) alors interdit
 
@@ -55,24 +54,22 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                        myCommand.CommandText = @"UPDATE Prescription 
-                                                                   SET id_users = @id_users, 
-                                                                       id_patients = @id_patients, 
-                                                                       quantity = @quantity, 
-                                                                       validity = @validity
-                                                                   WHERE id_prescription = @id_prescription";
-                    
-                        myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
-                        myCommand.Parameters.AddWithValue("@id_users", id_users);
-                        myCommand.Parameters.AddWithValue("@id_patients", id_patients);
-                        myCommand.Parameters.AddWithValue("@quantity", quantity);
-                        myCommand.Parameters.AddWithValue("@validity", validity.ToString("yyyy-MM-dd"));
 
-                        int rowsAffected = myCommand.ExecuteNonQuery();
-                        return rowsAffected > 0;
-                    
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"UPDATE Prescription 
+                                            SET id_user = @id_user, 
+                                                id_patient = @id_patient, 
+                                                validity = @validity
+                                            WHERE id_prescription = @id_prescription";
+
+                    myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+                    myCommand.Parameters.AddWithValue("@id_patient", id_patient);
+                    myCommand.Parameters.AddWithValue("@validity", validity.ToString("yyyy-MM-dd"));
+
+                    int rowsAffected = myCommand.ExecuteNonQuery();
+                    return rowsAffected > 0;
                 }
                 catch (Exception ex)
                 {
@@ -83,7 +80,7 @@ namespace GSB_2.DAO
         }
 
         // DELETE - Supprimer une prescription
-        public bool deletePrescription(int id_prescription, int id_users, int id_patients, int quantity, DateTime validity, bool userRole)
+        public bool deletePrescription(int id_prescription, bool userRole)
         {
             if (userRole) return false; // Si True (1) alors interdit
 
@@ -92,20 +89,15 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
+
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"DELETE FROM Prescription 
-                                            WHERE id_prescription = @id_prescription";
-                    
+                    myCommand.CommandText = @"DELETE FROM Prescription WHERE id_prescription = @id_prescription";
+
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
-                    myCommand.Parameters.AddWithValue("@id_users", id_users);
-                    myCommand.Parameters.AddWithValue("@id_patients", id_patients);
-                    myCommand.Parameters.AddWithValue("@quantity", quantity);
-                    myCommand.Parameters.AddWithValue("@validity", validity.ToString("yyyy-MM-dd"));
 
                     int rowsAffected = myCommand.ExecuteNonQuery();
-                        return rowsAffected > 0;
-                    
+                    return rowsAffected > 0;
                 }
                 catch (Exception ex)
                 {
@@ -125,36 +117,74 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                        myCommand.CommandText = @"SELECT id_prescription, id_users, id_patients, quantity, validity 
-                                                                   FROM Prescription";
-                    
-                        using (MySqlDataReader reader = myCommand.ExecuteReader())
+
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT * FROM Prescription";
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            prescriptions.Add(new Prescription
                             {
-                                prescriptions.Add(new Prescription
-                                {
-                                    Id = reader.GetInt32("id_prescription"),
-                                    Id_users = reader.IsDBNull(reader.GetOrdinal("id_users")) ? 0 : reader.GetInt32("id_users"),
-                                    Id_patients = reader.IsDBNull(reader.GetOrdinal("id_patients")) ? 0 : reader.GetInt32("id_patients"),
-                                    quantity = reader.IsDBNull(reader.GetOrdinal("quantity")) ? 0 : reader.GetInt32("quantity"),
-                                    validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
-                                });
-                            }
+                                Id_prescription = reader.GetInt32("id_prescription"),
+                                Id_user = reader.IsDBNull(reader.GetOrdinal("id_user")) ? 0 : reader.GetInt32("id_user"),
+                                Id_patient = reader.IsDBNull(reader.GetOrdinal("id_patient")) ? 0 : reader.GetInt32("id_patient"),
+                                Validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
+                            });
                         }
-                    
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Erreur lors de la récupération : " + ex.Message);
                 }
             }
+
             return prescriptions;
         }
+
+        // READ - Récupérer une prescription par son ID
+        public Prescription getPrescriptionById(int id_prescription)
+        {
+            using (var connection = db.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT * FROM Prescription WHERE id_prescription = @id_prescription";
+
+                    myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new Prescription
+                            {
+                                Id_prescription = reader.GetInt32("id_prescription"),
+                                Id_user = reader.IsDBNull(reader.GetOrdinal("id_user")) ? 0 : reader.GetInt32("id_user"),
+                                Id_patient = reader.IsDBNull(reader.GetOrdinal("id_patient")) ? 0 : reader.GetInt32("id_patient"),
+                                Validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
+                            };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la récupération : " + ex.Message);
+                }
+            }
+
+            return null;
+        }
+
         // READ - Récupérer les prescriptions d'un patient
-        public List<Prescription> getPrescriptionByPatientId(int id_patients)
+        public List<Prescription> getPrescriptionByPatientId(int id_patient)
         {
             List<Prescription> prescriptions = new List<Prescription>();
 
@@ -163,37 +193,114 @@ namespace GSB_2.DAO
                 try
                 {
                     connection.Open();
-                        MySqlCommand myCommand = new MySqlCommand();
-                        myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT id_prescription, id_users, id_patients, quantity, validity 
-                                                                   FROM Prescription 
-                                                                   WHERE id_patients = @id_patients";
-                    
-                        myCommand.Parameters.AddWithValue("@id_patients", id_patients);
 
-                        using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT * FROM Prescription WHERE id_patient = @id_patient";
+
+                    myCommand.Parameters.AddWithValue("@id_patient", id_patient);
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            prescriptions.Add(new Prescription
                             {
-                                prescriptions.Add(new Prescription
-                                {
-                                    Id = reader.GetInt32("id_prescription"),
-                                    Id_users = reader.IsDBNull(reader.GetOrdinal("id_users")) ? 0 : reader.GetInt32("id_users"),
-                                    Id_patients = reader.GetInt32("id_patients"),
-                                    quantity = reader.IsDBNull(reader.GetOrdinal("quantity")) ? 0 : reader.GetInt32("quantity"),
-                                    validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
-                                });
-                            }
+                                Id_prescription = reader.GetInt32("id_prescription"),
+                                Id_user = reader.IsDBNull(reader.GetOrdinal("id_user")) ? 0 : reader.GetInt32("id_user"),
+                                Id_patient = reader.GetInt32("id_patient"),
+                                Validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
+                            });
                         }
-                    
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Erreur lors de la récupération : " + ex.Message);
                 }
             }
+
+            return prescriptions;
+        }
+
+        // READ - Récupérer les prescriptions d'un utilisateur
+        public List<Prescription> getPrescriptionByUserId(int id_user)
+        {
+            List<Prescription> prescriptions = new List<Prescription>();
+
+            using (var connection = db.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT * FROM Prescription WHERE id_user = @id_user";
+
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            prescriptions.Add(new Prescription
+                            {
+                                Id_prescription = reader.GetInt32("id_prescription"),
+                                Id_user = reader.GetInt32("id_user"),
+                                Id_patient = reader.IsDBNull(reader.GetOrdinal("id_patient")) ? 0 : reader.GetInt32("id_patient"),
+                                Validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la récupération : " + ex.Message);
+                }
+            }
+
+            return prescriptions;
+        }
+
+        // Récupérer les prescriptions valides (non expirées)
+        public List<Prescription> getValidPrescriptions()
+        {
+            List<Prescription> prescriptions = new List<Prescription>();
+
+            using (var connection = db.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT * FROM Prescription WHERE validity >= @today";
+
+                    myCommand.Parameters.AddWithValue("@today", DateTime.Now.Date);
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            prescriptions.Add(new Prescription
+                            {
+                                Id_prescription = reader.GetInt32("id_prescription"),
+                                Id_user = reader.IsDBNull(reader.GetOrdinal("id_user")) ? 0 : reader.GetInt32("id_user"),
+                                Id_patient = reader.IsDBNull(reader.GetOrdinal("id_patient")) ? 0 : reader.GetInt32("id_patient"),
+                                Validity = reader.IsDBNull(reader.GetOrdinal("validity")) ? DateTime.MinValue : reader.GetDateTime("validity")
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la récupération : " + ex.Message);
+                }
+            }
+
             return prescriptions;
         }
     }
 }
-

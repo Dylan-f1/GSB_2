@@ -124,15 +124,14 @@ namespace GSB_2.Forms
                 var patients = patientDAO.GetAll();
 
                 var displayList = prescriptions.Select(p => {
-                    var patient = patients.FirstOrDefault(pat => pat.Id == p.Id_patients);
-                    int medicineCount = appartientDAO.getMedicineCountByPrescriptionId(p.Id);
+                    var patient = patients.FirstOrDefault(pat => pat.Id_patient == p.Id_patient);
+                    int medicineCount = appartientDAO.getMedicineCountByPrescriptionId(p.Id_prescription);
 
                     return new
                     {
-                        ID = p.Id,
+                        ID = p.Id_prescription,
                         Patient = patient != null ? $"{patient.Name} {patient.Firstname}" : "Inconnu",
-                        Quantité = p.quantity,
-                        Validité = p.validity.ToString("dd/MM/yyyy"),
+                        Validité = p.Validity.ToString("dd/MM/yyyy"),
                         NbMédicaments = medicineCount
                     };
                 }).ToList();
@@ -168,27 +167,16 @@ namespace GSB_2.Forms
             var patients = patientDAO.GetAll();
             foreach (var patient in patients)
             {
-                cmbPatient.Items.Add(new { Text = $"{patient.Name} {patient.Firstname} ({patient.Age} ans)", Value = patient.Id });
+                cmbPatient.Items.Add(new { Text = $"{patient.Name} {patient.Firstname} ({patient.Age} ans)", Value = patient.Id_patient });
             }
             cmbPatient.DisplayMember = "Text";
             cmbPatient.ValueMember = "Value";
 
-            // Quantité
-            Label lblQuantity = new Label { Text = "Quantité :", Location = new Point(20, 60), AutoSize = true };
-            NumericUpDown numQuantity = new NumericUpDown
-            {
-                Location = new Point(120, 57),
-                Width = 100,
-                Minimum = 1,
-                Maximum = 1000,
-                Value = 1
-            };
-
             // Date de validité
-            Label lblValidity = new Label { Text = "Validité :", Location = new Point(20, 100), AutoSize = true };
+            Label lblValidity = new Label { Text = "Validité :", Location = new Point(20, 60), AutoSize = true };
             DateTimePicker dtpValidity = new DateTimePicker
             {
-                Location = new Point(120, 97),
+                Location = new Point(120, 57),
                 Width = 200,
                 Format = DateTimePickerFormat.Short,
                 MinDate = DateTime.Now
@@ -198,31 +186,60 @@ namespace GSB_2.Forms
             Label lblMedicines = new Label
             {
                 Text = "Médicaments à ajouter :",
-                Location = new Point(20, 140),
+                Location = new Point(20, 100),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 AutoSize = true
             };
 
-            ListBox lstMedicines = new ListBox
+            // ListBox avec quantités
+            Panel panelMedicines = new Panel
             {
-                Location = new Point(20, 165),
-                Size = new Size(350, 100),
-                SelectionMode = SelectionMode.MultiExtended
+                Location = new Point(20, 125),
+                Size = new Size(500, 120),
+                AutoScroll = true,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            CheckedListBox clbMedicines = new CheckedListBox
+            {
+                Location = new Point(0, 0),
+                Size = new Size(250, 120),
+                CheckOnClick = true
             };
 
             var medicines = medicineDAO.GetAll();
             foreach (var medicine in medicines)
             {
-                lstMedicines.Items.Add(new { Text = $"{medicine.Name} - {medicine.Dosage}", Value = medicine.Id });
+                clbMedicines.Items.Add(new { Text = $"{medicine.Name} - {medicine.Dosage}mg", Value = medicine.Id_medicine });
             }
-            lstMedicines.DisplayMember = "Text";
-            lstMedicines.ValueMember = "Value";
+            clbMedicines.DisplayMember = "Text";
+            clbMedicines.ValueMember = "Value";
+
+            Label lblQuantityInfo = new Label
+            {
+                Text = "Quantité par médicament :",
+                Location = new Point(260, 5),
+                AutoSize = true
+            };
+
+            NumericUpDown numMedicineQuantity = new NumericUpDown
+            {
+                Location = new Point(260, 30),
+                Width = 100,
+                Minimum = 1,
+                Maximum = 1000,
+                Value = 1
+            };
+
+            panelMedicines.Controls.Add(clbMedicines);
+            panelMedicines.Controls.Add(lblQuantityInfo);
+            panelMedicines.Controls.Add(numMedicineQuantity);
 
             // Boutons
             Button btnSave = new Button
             {
                 Text = "Enregistrer",
-                Location = new Point(120, 290),
+                Location = new Point(120, 270),
                 Size = new Size(120, 40),
                 BackColor = Color.FromArgb(0, 120, 215),
                 ForeColor = Color.White,
@@ -232,7 +249,7 @@ namespace GSB_2.Forms
             Button btnCancel = new Button
             {
                 Text = "Annuler",
-                Location = new Point(250, 290),
+                Location = new Point(250, 270),
                 Size = new Size(120, 40),
                 BackColor = Color.Gray,
                 ForeColor = Color.White,
@@ -248,7 +265,7 @@ namespace GSB_2.Forms
                     return;
                 }
 
-                if (lstMedicines.SelectedItems.Count == 0)
+                if (clbMedicines.CheckedItems.Count == 0)
                 {
                     MessageBox.Show("Veuillez sélectionner au moins un médicament.", "Validation",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -260,7 +277,6 @@ namespace GSB_2.Forms
                 bool success = prescriptionDAO.createPrescription(
                     currentUserId,
                     patientId,
-                    (int)numQuantity.Value,
                     dtpValidity.Value,
                     false // userRole = false pour Doctor
                 );
@@ -269,13 +285,14 @@ namespace GSB_2.Forms
                 {
                     // Récupérer l'ID de la prescription créée
                     var prescriptions = prescriptionDAO.getAllPrescription();
-                    int prescriptionId = prescriptions.Max(p => p.Id);
+                    int prescriptionId = prescriptions.Max(p => p.Id_prescription);
 
-                    // Ajouter les médicaments
-                    foreach (var item in lstMedicines.SelectedItems)
+                    // Ajouter les médicaments avec leur quantité
+                    int quantity = (int)numMedicineQuantity.Value;
+                    foreach (var item in clbMedicines.CheckedItems)
                     {
                         int medicineId = ((dynamic)item).Value;
-                        appartientDAO.addMedicineToPrescrition(prescriptionId, medicineId);
+                        appartientDAO.addMedicineToPrescrition(prescriptionId, medicineId, quantity);
                     }
 
                     MessageBox.Show("Prescription créée avec succès !", "Succès",
@@ -295,9 +312,8 @@ namespace GSB_2.Forms
             formCreate.Controls.AddRange(new Control[]
             {
                 lblPatient, cmbPatient,
-                lblQuantity, numQuantity,
                 lblValidity, dtpValidity,
-                lblMedicines, lstMedicines,
+                lblMedicines, panelMedicines,
                 btnSave, btnCancel
             });
 
@@ -315,40 +331,30 @@ namespace GSB_2.Forms
             }
 
             int prescriptionId = Convert.ToInt32(dataGridViewPrescription.SelectedRows[0].Cells["ID"].Value);
-            var prescription = prescriptionDAO.getAllPrescription().FirstOrDefault(p => p.Id == prescriptionId);
+            var prescription = prescriptionDAO.getAllPrescription().FirstOrDefault(p => p.Id_prescription == prescriptionId);
 
             if (prescription == null) return;
 
-            // Formulaire de modification (similaire à la création)
+            // Formulaire de modification
             Form formEdit = new Form();
             formEdit.Text = "Modifier une Prescription";
-            formEdit.Size = new Size(550, 300);
+            formEdit.Size = new Size(550, 250);
             formEdit.StartPosition = FormStartPosition.CenterParent;
             formEdit.FormBorderStyle = FormBorderStyle.FixedDialog;
 
-            Label lblQuantity = new Label { Text = "Quantité :", Location = new Point(20, 20), AutoSize = true };
-            NumericUpDown numQuantity = new NumericUpDown
-            {
-                Location = new Point(120, 17),
-                Width = 100,
-                Minimum = 1,
-                Maximum = 1000,
-                Value = prescription.quantity
-            };
-
-            Label lblValidity = new Label { Text = "Validité :", Location = new Point(20, 60), AutoSize = true };
+            Label lblValidity = new Label { Text = "Validité :", Location = new Point(20, 20), AutoSize = true };
             DateTimePicker dtpValidity = new DateTimePicker
             {
-                Location = new Point(120, 57),
+                Location = new Point(120, 17),
                 Width = 200,
                 Format = DateTimePickerFormat.Short,
-                Value = prescription.validity
+                Value = prescription.Validity
             };
 
             Button btnSave = new Button
             {
                 Text = "Enregistrer",
-                Location = new Point(120, 120),
+                Location = new Point(120, 80),
                 Size = new Size(120, 40),
                 BackColor = Color.FromArgb(0, 120, 215),
                 ForeColor = Color.White,
@@ -358,7 +364,7 @@ namespace GSB_2.Forms
             Button btnCancel = new Button
             {
                 Text = "Annuler",
-                Location = new Point(250, 120),
+                Location = new Point(250, 80),
                 Size = new Size(120, 40),
                 BackColor = Color.Gray,
                 ForeColor = Color.White,
@@ -369,9 +375,8 @@ namespace GSB_2.Forms
             {
                 bool success = prescriptionDAO.updatePrescription(
                     prescriptionId,
-                    prescription.Id_users,
-                    prescription.Id_patients,
-                    (int)numQuantity.Value,
+                    prescription.Id_user,
+                    prescription.Id_patient,
                     dtpValidity.Value,
                     false
                 );
@@ -394,7 +399,6 @@ namespace GSB_2.Forms
 
             formEdit.Controls.AddRange(new Control[]
             {
-                lblQuantity, numQuantity,
                 lblValidity, dtpValidity,
                 btnSave, btnCancel
             });
@@ -418,34 +422,23 @@ namespace GSB_2.Forms
             if (result == DialogResult.Yes)
             {
                 int prescriptionId = Convert.ToInt32(dataGridViewPrescription.SelectedRows[0].Cells["ID"].Value);
-                var prescription = prescriptionDAO.getAllPrescription().FirstOrDefault(p => p.Id == prescriptionId);
 
-                if (prescription != null)
+                // Supprimer d'abord les médicaments liés
+                appartientDAO.removeAllMedicinesFromPrescription(prescriptionId);
+
+                // Puis supprimer la prescription
+                bool success = prescriptionDAO.deletePrescription(prescriptionId, false);
+
+                if (success)
                 {
-                    // Supprimer d'abord les médicaments liés
-                    appartientDAO.removeAllMedicinesFromPrescription(prescriptionId);
-
-                    // Puis supprimer la prescription
-                    bool success = prescriptionDAO.deletePrescription(
-                        prescriptionId,
-                        prescription.Id_users,
-                        prescription.Id_patients,
-                        prescription.quantity,
-                        prescription.validity,
-                        false
-                    );
-
-                    if (success)
-                    {
-                        MessageBox.Show("Prescription supprimée avec succès !", "Succès",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadPrescription();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Erreur lors de la suppression.", "Erreur",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    MessageBox.Show("Prescription supprimée avec succès !", "Succès",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadPrescription();
+                }
+                else
+                {
+                    MessageBox.Show("Erreur lors de la suppression.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -466,7 +459,7 @@ namespace GSB_2.Forms
             // Afficher les médicaments dans un formulaire
             Form formMedicines = new Form();
             formMedicines.Text = $"Médicaments de la prescription #{prescriptionId}";
-            formMedicines.Size = new Size(700, 400);
+            formMedicines.Size = new Size(800, 400);
             formMedicines.StartPosition = FormStartPosition.CenterParent;
 
             DataGridView dgvMedicines = new DataGridView();
@@ -478,8 +471,9 @@ namespace GSB_2.Forms
             {
                 Nom = m.Name,
                 Molécule = m.Molecule,
-                Dosage = m.Dosage,
-                Description = m.Description
+                Dosage = $"{m.Dosage}mg",
+                Description = m.Description,
+                Quantité = appartientDAO.getMedicineQuantity(prescriptionId, m.Id_medicine)
             }).ToList();
 
             dgvMedicines.DataSource = displayList;

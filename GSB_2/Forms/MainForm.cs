@@ -142,7 +142,7 @@ namespace GSB_2.Forms
                     {
                         string userName = !string.IsNullOrEmpty(user.Name) ? user.Name : "Médecin";
 
-                        FormDoctor formDoctor = new FormDoctor(user.Id, userName);
+                        FormDoctor formDoctor = new FormDoctor(user.Id_user, userName);
                         formDoctor.Show();
                     }
                 }
@@ -157,6 +157,7 @@ namespace GSB_2.Forms
                 MessageBox.Show($"Erreur de connexion : {ex.Message}", "Erreur",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
         }
     }
 }

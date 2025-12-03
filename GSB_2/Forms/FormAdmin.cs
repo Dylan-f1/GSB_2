@@ -46,7 +46,7 @@ namespace GSB_2.Forms
 
                 var displayList = userList.Select(u => new
                 {
-                    Id = u.Id,
+                    Id = u.Id_user,
                     Firstname = u.Firstname,
                     Name = u.Name,
                     Email = u.Email,

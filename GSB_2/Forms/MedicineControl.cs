@@ -46,7 +46,7 @@ namespace GSB_2.Forms
             var medList = medDAO.GetAll();
             var displayList = medList.Select(m => new
             {
-                Id = m.Id,
+                Id = m.Id_medicine,
                 Name = m.Name,
                 Molecule = m.Molecule,
                 Dosage = m.Dosage,

@@ -139,7 +139,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT m.id_medicine, m.id_users, m.name, m.description, m.molecule, m.dosage, a.quantity
+                    myCommand.CommandText = @"SELECT m.id_medicine, m.id_user, m.name, m.description, m.molecule, m.dosage, a.quantity
                                             FROM medicine m
                                             INNER JOIN appartient a ON m.id_medicine = a.id_medicine
                                             WHERE a.id_prescription = @id_prescription";
@@ -152,8 +152,8 @@ namespace GSB_2.DAO
                         {
                             Medicine medicine = new Medicine(
                                 reader.GetInt32("id_medicine"),
-                                reader.GetInt32("id_users"),
-                                reader.GetString("dosage"),
+                                reader.GetInt32("id_user"),
+                                reader.GetInt32("dosage"),
                                 reader.GetString("name"),
                                 reader.GetString("description"),
                                 reader.GetString("molecule")
