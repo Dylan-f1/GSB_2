@@ -1,167 +1,573 @@
 ﻿using System;
-using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
-using GSB_2.Forms;
+using GSB_2.DAO;
+using GSB_2.Models;
 
 namespace GSB_2.Forms
 {
     public partial class FormDoctor : Form
     {
-        private Panel sidePanel;
-        private Panel contentPanel;
-        private Button btnMedicines;
-        private Button btnPrescriptions;
-        private Button btnLogout;
-        private Label lblUserInfo;
+        private readonly PatientDAO patientDAO;
+        private readonly MedicineDAO medicineDAO;
+        private readonly PrescriptionDAO prescriptionDAO;
         private int currentUserId;
-        private string currentUserName;
+        private bool userRole; // false = Doctor
 
-        public FormDoctor(int userId, string userName)
+        public FormDoctor(int userId, bool role)
         {
             InitializeComponent();
+
             currentUserId = userId;
-            currentUserName = userName;
-            InitializeCustomComponents();
+            userRole = role;
+            patientDAO = new PatientDAO();
+            medicineDAO = new MedicineDAO();
+            prescriptionDAO = new PrescriptionDAO();
 
-            LoadUserControl(new MedicineControl());
+            LoadPatients();
+            LoadMedicines();
+            LoadPrescriptionsData();
         }
 
-        private void InitializeCustomComponents()
-        {
-            // Configuration du formulaire principal
-            this.Text = "GSB - Espace Médecin";
-            this.Size = new Size(1200, 700);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(240, 240, 240);
+        // ==================== PATIENT ====================
 
-            // ===== SIDE PANEL =====
-            sidePanel = new Panel();
-            sidePanel.Dock = DockStyle.Left;
-            sidePanel.Width = 220;
-            sidePanel.BackColor = Color.FromArgb(45, 45, 48);
-            this.Controls.Add(sidePanel);
-
-            // ===== CONTENT PANEL =====
-            contentPanel = new Panel();
-            contentPanel.Dock = DockStyle.Fill;
-            contentPanel.BackColor = Color.White;
-            contentPanel.Padding = new Padding(10);
-            contentPanel.Visible = true;
-
-            this.Controls.Add(contentPanel);
-            this.Controls.Add(sidePanel);
-
-            // Logo/Titre de l'application
-            Label lblAppTitle = new Label();
-            lblAppTitle.Text = "GSB";   
-            lblAppTitle.Font = new Font("Segoe UI", 16, FontStyle.Bold);
-            lblAppTitle.ForeColor = Color.White;
-            lblAppTitle.Location = new Point(15, 20);
-            lblAppTitle.AutoSize = true;
-            sidePanel.Controls.Add(lblAppTitle);
-
-            // Informations utilisateur
-            lblUserInfo = new Label();
-            lblUserInfo.Text = $"👤 Dr. {currentUserName}";
-            lblUserInfo.Font = new Font("Segoe UI", 10, FontStyle.Regular);
-            lblUserInfo.ForeColor = Color.FromArgb(200, 200, 200);
-            lblUserInfo.Location = new Point(15, 60);
-            lblUserInfo.AutoSize = true;
-            sidePanel.Controls.Add(lblUserInfo);
-
-            // Ligne de séparation
-            Panel separator = new Panel();
-            separator.BackColor = Color.FromArgb(70, 70, 70);
-            separator.Location = new Point(10, 95);
-            separator.Size = new Size(200, 2);
-            sidePanel.Controls.Add(separator);
-
-            // Bouton Médicaments
-            btnMedicines = CreateSideButton("💊 Médicaments", 110);
-            btnMedicines.Click += BtnMedicines_Click;
-            sidePanel.Controls.Add(btnMedicines);
-
-            // Bouton Prescriptions
-            btnPrescriptions = CreateSideButton("📋 Prescriptions", 160);
-            btnPrescriptions.Click += BtnPrescriptions_Click;
-            sidePanel.Controls.Add(btnPrescriptions);
-
-            // Ligne de séparation en bas
-            Panel separatorBottom = new Panel();
-            separatorBottom.BackColor = Color.FromArgb(70, 70, 70);
-            separatorBottom.Location = new Point(10, 580);
-            separatorBottom.Size = new Size(200, 2);
-            sidePanel.Controls.Add(separatorBottom);
-
-            // Bouton Déconnexion
-            btnLogout = CreateSideButton("Déconnexion", 595);
-            btnLogout.BackColor = Color.FromArgb(192, 57, 43);
-            btnLogout.Click += BtnLogout_Click;
-            sidePanel.Controls.Add(btnLogout);
-        }
-
-        private Button CreateSideButton(string text, int yPosition)
-        {
-            Button btn = new Button();
-            btn.Text = text;
-            btn.Location = new Point(10, yPosition);
-            btn.Size = new Size(200, 45);
-            btn.BackColor = Color.FromArgb(45, 45, 48);
-            btn.ForeColor = Color.White;
-            btn.FlatStyle = FlatStyle.Flat;
-            btn.FlatAppearance.BorderSize = 0;
-            btn.Font = new Font("Segoe UI", 11, FontStyle.Regular);
-            btn.TextAlign = ContentAlignment.MiddleLeft;
-            btn.Cursor = Cursors.Hand;
-            btn.Padding = new Padding(15, 0, 0, 0);
-
-            // Effet hover
-            btn.MouseEnter += (s, e) => {
-                if (btn.BackColor != Color.FromArgb(0, 120, 215))
-                    btn.BackColor = Color.FromArgb(60, 60, 65);
-            };
-            btn.MouseLeave += (s, e) => {
-                if (btn.BackColor != Color.FromArgb(0, 120, 215))
-                    btn.BackColor = Color.FromArgb(45, 45, 48);
-            };
-
-            return btn;
-        }
-
-
-        private void LoadUserControl(UserControl userControl)
+        private void LoadPatients()
         {
             try
             {
-                // Nettoyer le contentPanel
-                contentPanel.Controls.Clear();
+                var patientList = patientDAO.GetAll();
 
-                // Ajouter le nouveau UserControl
-                userControl.Dock = DockStyle.Fill;
-                userControl.Visible = true;
-                contentPanel.Controls.Add(userControl);
+                if (patientList == null || patientList.Count == 0)
+                {
+                    dataGridViewPatients.DataSource = null;
+                    return;
+                }
 
-               
-                userControl.BringToFront();
-                contentPanel.Refresh();
+                var displayList = patientList.Select(p => new
+                {
+                    Id = p.Id_patient,
+                    Nom = p.Name,
+                    Prénom = p.Firstname,
+                    Age = p.Age,
+                    Genre = p.Gender
+                }).ToList();
+
+                dataGridViewPatients.DataSource = displayList;
+                dataGridViewPatients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show($"Erreur lors du chargement des patients: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void BtnMedicines_Click(object sender, EventArgs e)
+        private void buttonPatientAdd_Click(object sender, EventArgs e)
         {
-            LoadUserControl(new MedicineControl());
+            try
+            {
+                // Validation
+                if (string.IsNullOrWhiteSpace(textBoxPatientFirstname.Text))
+                {
+                    MessageBox.Show("Le prénom est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBoxPatientName.Text))
+                {
+                    MessageBox.Show("Le nom est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBoxPatientAge.Text))
+                {
+                    MessageBox.Show("L'âge est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(textBoxPatientAge.Text, out int age) || age <= 0)
+                {
+                    MessageBox.Show("L'âge doit être un nombre valide.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (comboBoxPatientGender.SelectedItem == null)
+                {
+                    MessageBox.Show("Le genre est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Appeler createPatient avec les paramètres individuels
+                bool success = patientDAO.createPatient(
+                    currentUserId,
+                    textBoxPatientName.Text.Trim(),
+                    age,
+                    textBoxPatientFirstname.Text.Trim(),
+                    comboBoxPatientGender.SelectedItem.ToString(),
+                    userRole
+                );
+
+                if (success)
+                {
+                    LoadPatients();
+                    ClearPatientFields();
+                    MessageBox.Show("Patient ajouté avec succès !", "Succès",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Erreur lors de l'ajout du patient.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void BtnPrescriptions_Click(object sender, EventArgs e)
+        private void buttonPatientDelete_Click(object sender, EventArgs e)
         {
-            LoadUserControl(new PrescriptionControl(currentUserId));
+            try
+            {
+                if (dataGridViewPatients.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show("Veuillez sélectionner un patient à supprimer.",
+                        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int id = Convert.ToInt32(dataGridViewPatients.SelectedRows[0].Cells["Id"].Value);
+
+                var result = MessageBox.Show(
+                    "Êtes-vous sûr de vouloir supprimer ce patient ?",
+                    "Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    bool success = patientDAO.deletePatient(id, userRole);
+
+                    if (success)
+                    {
+                        LoadPatients();
+                        ClearPatientFields();
+                        MessageBox.Show("Patient supprimé avec succès !", "Succès",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erreur lors de la suppression du patient.", "Erreur",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void BtnLogout_Click(object sender, EventArgs e)
+        private void buttonPatientClear_Click(object sender, EventArgs e)
+        {
+            ClearPatientFields();
+        }
+
+        private void ClearPatientFields()
+        {
+            textBoxPatientFirstname.Clear();
+            textBoxPatientName.Clear();
+            textBoxPatientAge.Clear();
+            if (comboBoxPatientGender.Items.Count > 0)
+                comboBoxPatientGender.SelectedIndex = 0;
+            dataGridViewPatients.ClearSelection();
+        }
+
+        private void dataGridViewPatients_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewPatients.SelectedRows.Count > 0)
+            {
+                var row = dataGridViewPatients.SelectedRows[0];
+                textBoxPatientFirstname.Text = row.Cells["Prénom"].Value?.ToString() ?? "";
+                textBoxPatientName.Text = row.Cells["Nom"].Value?.ToString() ?? "";
+                textBoxPatientAge.Text = row.Cells["Age"].Value?.ToString() ?? "";
+
+                string gender = row.Cells["Genre"].Value?.ToString() ?? "";
+                if (!string.IsNullOrEmpty(gender))
+                {
+                    comboBoxPatientGender.SelectedItem = gender;
+                }
+            }
+        }
+
+        // ==================== MEDICINE ====================
+
+        private void LoadMedicines()
+        {
+            try
+            {
+                var medicineList = medicineDAO.GetAll();
+
+                if (medicineList == null || medicineList.Count == 0)
+                {
+                    dataGridViewMedicines.DataSource = null;
+                    return;
+                }
+
+                var displayList = medicineList.Select(m => new
+                {
+                    Id = m.Id_medicine,
+                    Nom = m.Name,
+                    Dosage = m.Dosage,
+                    Molécule = m.Molecule,
+                    Description = m.Description
+                }).ToList();
+
+                dataGridViewMedicines.DataSource = displayList;
+                dataGridViewMedicines.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des médicaments: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonMedicineAdd_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(textBoxMedicineName.Text))
+                {
+                    MessageBox.Show("Le nom du médicament est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBoxMedicineDosage.Text))
+                {
+                    MessageBox.Show("Le dosage est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(textBoxMedicineDosage.Text, out int dosage) || dosage <= 0)
+                {
+                    MessageBox.Show("Le dosage doit être un nombre valide.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBoxMedicineMolecule.Text))
+                {
+                    MessageBox.Show("La molécule est obligatoire.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Appeler createMedicine avec les paramètres individuels
+                bool success = medicineDAO.createMedicine(
+                    currentUserId,                               
+                    textBoxMedicineName.Text.Trim(),            
+                    textBoxMedicineDescription.Text.Trim(),     
+                    textBoxMedicineMolecule.Text.Trim(),       
+                    dosage,                                     
+                    userRole                                    
+                );
+
+                if (success)
+                {
+                    LoadMedicines();
+                    ClearMedicineFields();
+                    MessageBox.Show("Médicament ajouté avec succès !", "Succès",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Erreur lors de l'ajout du médicament.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonMedicineDelete_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridViewMedicines.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show("Veuillez sélectionner un médicament à supprimer.",
+                        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int id = Convert.ToInt32(dataGridViewMedicines.SelectedRows[0].Cells["Id"].Value);
+
+                var result = MessageBox.Show(
+                    "Êtes-vous sûr de vouloir supprimer ce médicament ?",
+                    "Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    bool success = medicineDAO.deleteMedicine(id, userRole);
+
+                    if (success)
+                    {
+                        LoadMedicines();
+                        ClearMedicineFields();
+                        MessageBox.Show("Médicament supprimé avec succès !", "Succès",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erreur lors de la suppression du médicament.", "Erreur",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonMedicineClear_Click(object sender, EventArgs e)
+        {
+            ClearMedicineFields();
+        }
+
+        private void ClearMedicineFields()
+        {
+            textBoxMedicineName.Clear();
+            textBoxMedicineDosage.Clear();
+            textBoxMedicineMolecule.Clear();
+            textBoxMedicineDescription.Clear();
+            dataGridViewMedicines.ClearSelection();
+        }
+
+        private void dataGridViewMedicines_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewMedicines.SelectedRows.Count > 0)
+            {
+                var row = dataGridViewMedicines.SelectedRows[0];
+                textBoxMedicineName.Text = row.Cells["Nom"].Value?.ToString() ?? "";
+                textBoxMedicineDosage.Text = row.Cells["Dosage"].Value?.ToString() ?? "";
+                textBoxMedicineMolecule.Text = row.Cells["Molécule"].Value?.ToString() ?? "";
+                textBoxMedicineDescription.Text = row.Cells["Description"].Value?.ToString() ?? "";
+            }
+        }
+
+        // ==================== PRESCRIPTION ====================
+
+        private void LoadPrescriptionsData()
+        {
+            try
+            {
+                // Charger les ComboBox
+                var patients = patientDAO.GetAll();
+                comboBoxPatient.DataSource = patients;
+                comboBoxPatient.DisplayMember = "Firstname";
+                comboBoxPatient.ValueMember = "Id_patient";
+
+                // Charger les médicaments pour la ComboBox
+                var medicines = medicineDAO.GetAll();
+                comboBoxMedicine.DataSource = medicines;
+                comboBoxMedicine.DisplayMember = "Name";
+                comboBoxMedicine.ValueMember = "Id_medicine";
+
+                // Charger le DataGridView des prescriptions
+                var prescriptionList = prescriptionDAO.getAllPrescription();
+
+                if (prescriptionList == null || prescriptionList.Count == 0)
+                {
+                    dataGridViewPrescriptions.DataSource = null;
+                    return;
+                }
+
+                var displayList = prescriptionList.Select(p => new
+                {
+                    Id = p.Id_prescription,
+                    Id_Patient = p.Id_patient,
+                    Validité = p.Validity.ToString("dd/MM/yyyy")
+                }).ToList();
+
+                dataGridViewPrescriptions.DataSource = displayList;
+                dataGridViewPrescriptions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des prescriptions: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonPrescriptionAdd_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (comboBoxPatient.SelectedValue == null)
+                {
+                    MessageBox.Show("Veuillez sélectionner un patient.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (comboBoxMedicine.SelectedValue == null)
+                {
+                    MessageBox.Show("Veuillez sélectionner un médicament.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBoxQuantity.Text))
+                {
+                    MessageBox.Show("Veuillez entrer une quantité.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(textBoxQuantity.Text, out int quantity) || quantity <= 0)
+                {
+                    MessageBox.Show("La quantité doit être un nombre valide.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 1. Créer la prescription
+                bool prescriptionCreated = prescriptionDAO.createPrescription(
+                    currentUserId,
+                    (int)comboBoxPatient.SelectedValue,
+                    dateTimePickerValidity.Value,
+                    userRole
+                );
+
+                if (prescriptionCreated)
+                {
+                    // 2. Récupérer l'ID de la dernière prescription créée
+                    int lastPrescriptionId = prescriptionDAO.getLastInsertedId();
+
+                    // 3. Ajouter le médicament à la prescription avec AppartientDAO
+                    AppartientDAO appartientDAO = new AppartientDAO();
+                    bool medicineAdded = appartientDAO.addMedicineToPrescrition(
+                        lastPrescriptionId,
+                        (int)comboBoxMedicine.SelectedValue,
+                        quantity
+                    );
+
+                    if (medicineAdded)
+                    {
+                        LoadPrescriptionsData();
+                        ClearPrescriptionFields();
+                        MessageBox.Show("Prescription créée et médicament ajouté avec succès !", "Succès",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Prescription créée mais erreur lors de l'ajout du médicament.", "Avertissement",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Erreur lors de la création de la prescription.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonPrescriptionDelete_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridViewPrescriptions.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show("Veuillez sélectionner une prescription à supprimer.",
+                        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int id = Convert.ToInt32(dataGridViewPrescriptions.SelectedRows[0].Cells["Id"].Value);
+
+                var result = MessageBox.Show(
+                    "Êtes-vous sûr de vouloir supprimer cette prescription et tous ses médicaments ?",
+                    "Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    // 1. Supprimer tous les médicaments de la prescription
+                    AppartientDAO appartientDAO = new AppartientDAO();
+                    appartientDAO.removeAllMedicinesFromPrescription(id);
+
+                    // 2. Supprimer la prescription
+                    bool success = prescriptionDAO.deletePrescription(id, userRole);
+
+                    if (success)
+                    {
+                        LoadPrescriptionsData();
+                        ClearPrescriptionFields();
+                        MessageBox.Show("Prescription supprimée avec succès !", "Succès",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erreur lors de la suppression de la prescription.", "Erreur",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonPrescriptionClear_Click(object sender, EventArgs e)
+        {
+            ClearPrescriptionFields();
+        }
+
+        private void ClearPrescriptionFields()
+        {
+            if (comboBoxPatient.Items.Count > 0)
+                comboBoxPatient.SelectedIndex = 0;
+
+            if (comboBoxMedicine.Items.Count > 0)
+                comboBoxMedicine.SelectedIndex = 0;
+
+            textBoxQuantity.Clear();
+            dateTimePickerValidity.Value = DateTime.Now;
+            dataGridViewPrescriptions.ClearSelection();
+        }
+        
+        // ==================== LOGOUT ====================
+        private void buttonFormDoctorLogout_Click(object sender, EventArgs e)
         {
             var result = MessageBox.Show(
                 "Êtes-vous sûr de vouloir vous déconnecter ?",
@@ -175,26 +581,6 @@ namespace GSB_2.Forms
                 this.Hide();
                 MainForm loginForm = new MainForm();
                 loginForm.Show();
-            }
-        }
-
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            base.OnFormClosing(e);
-
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                var result = MessageBox.Show(
-                    "Voulez-vous vraiment quitter l'application ?",
-                    "Confirmation",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question
-                );
-
-                if (result == DialogResult.No)
-                {
-                    e.Cancel = true;
-                }
             }
         }
     }

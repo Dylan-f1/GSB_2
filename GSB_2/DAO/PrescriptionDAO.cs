@@ -302,5 +302,27 @@ namespace GSB_2.DAO
 
             return prescriptions;
         }
+
+        // À ajouter dans PrescriptionDAO.cs
+        public int getLastInsertedId()
+        {
+            using (var connection = db.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = "SELECT LAST_INSERT_ID()";
+
+                    return Convert.ToInt32(myCommand.ExecuteScalar());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la récupération du dernier ID : " + ex.Message);
+                    return 0;
+                }
+            }
+        }
     }
 }
