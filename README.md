@@ -148,7 +148,3 @@ Pour une documentation technique détaillée incluant :
 ## License
 
 Projet académique - GSB 2
-
-## 👨‍💻 Auteur
-
-Dylan - Étudiant en développement logiciel
