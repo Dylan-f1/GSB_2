@@ -240,6 +240,12 @@ namespace GSB_2.DAO
             }
         }
 
+        // READ - Récupérer un utilisateur par son ID
+        public User GetUserById(int userId)
+        {
+            return GetById(userId);
+        }
+
         // Récupérer un utilisateur par son email
         public User GetByEmail(string email)
         {

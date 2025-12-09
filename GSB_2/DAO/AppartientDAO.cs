@@ -140,7 +140,7 @@ namespace GSB_2.DAO
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT m.id_medicine, m.id_user, m.name, m.description, m.molecule, m.dosage, a.quantity
-                                            FROM medicine m
+                                            FROM Medicine m
                                             INNER JOIN Appartient a ON m.id_medicine = a.id_medicine
                                             WHERE a.id_prescription = @id_prescription";
 

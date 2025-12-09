@@ -69,6 +69,7 @@
             dateTimePickerValidity = new DateTimePicker();
             comboBoxPatient = new ComboBox();
             buttonFormDoctorLogout = new Button();
+            buttonExportPrescriptionPdf = new Button();
             tabControlFormDoctor.SuspendLayout();
             PatientPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPatients).BeginInit();
@@ -128,6 +129,7 @@
             buttonPatientDelete.TabIndex = 10;
             buttonPatientDelete.Text = "Delete";
             buttonPatientDelete.UseVisualStyleBackColor = true;
+            buttonPatientDelete.Click += buttonPatientDelete_Click;
             // 
             // buttonPatientAdd
             // 
@@ -289,6 +291,7 @@
             buttonMedicineClear.TabIndex = 6;
             buttonMedicineClear.Text = "Clear";
             buttonMedicineClear.UseVisualStyleBackColor = true;
+            buttonMedicineClear.Click += buttonMedicineClear_Click;
             // 
             // buttonMedicineDelete
             // 
@@ -298,6 +301,7 @@
             buttonMedicineDelete.TabIndex = 5;
             buttonMedicineDelete.Text = "Delete";
             buttonMedicineDelete.UseVisualStyleBackColor = true;
+            buttonMedicineDelete.Click += buttonMedicineDelete_Click;
             // 
             // buttonMedicineAdd
             // 
@@ -307,6 +311,7 @@
             buttonMedicineAdd.TabIndex = 4;
             buttonMedicineAdd.Text = "Add";
             buttonMedicineAdd.UseVisualStyleBackColor = true;
+            buttonMedicineAdd.Click += buttonMedicineAdd_Click;
             // 
             // textBoxMedicineDescription
             // 
@@ -338,6 +343,7 @@
             // 
             // PrescriptionPage
             // 
+            PrescriptionPage.Controls.Add(buttonExportPrescriptionPdf);
             PrescriptionPage.Controls.Add(labelPrescriptionQuantity);
             PrescriptionPage.Controls.Add(labelPrescriptionMedicine);
             PrescriptionPage.Controls.Add(labelPrescriptionDate);
@@ -426,15 +432,17 @@
             buttonPrescriptionClear.TabIndex = 4;
             buttonPrescriptionClear.Text = "Clear";
             buttonPrescriptionClear.UseVisualStyleBackColor = true;
+            buttonPrescriptionClear.Click += buttonPrescriptionClear_Click;
             // 
             // buttonPrescriptionDelete
             // 
-            buttonPrescriptionDelete.Location = new Point(174, 349);
+            buttonPrescriptionDelete.Location = new Point(133, 349);
             buttonPrescriptionDelete.Name = "buttonPrescriptionDelete";
             buttonPrescriptionDelete.Size = new Size(94, 29);
             buttonPrescriptionDelete.TabIndex = 3;
             buttonPrescriptionDelete.Text = "Delete";
             buttonPrescriptionDelete.UseVisualStyleBackColor = true;
+            buttonPrescriptionDelete.Click += buttonPrescriptionDelete_Click;
             // 
             // buttonPrescriptionAdd
             // 
@@ -444,6 +452,7 @@
             buttonPrescriptionAdd.TabIndex = 2;
             buttonPrescriptionAdd.Text = "Add";
             buttonPrescriptionAdd.UseVisualStyleBackColor = true;
+            buttonPrescriptionAdd.Click += buttonPrescriptionAdd_Click;
             // 
             // dateTimePickerValidity
             // 
@@ -468,6 +477,17 @@
             buttonFormDoctorLogout.TabIndex = 1;
             buttonFormDoctorLogout.Text = "Logout";
             buttonFormDoctorLogout.UseVisualStyleBackColor = true;
+            buttonFormDoctorLogout.Click += buttonFormDoctorLogout_Click;
+            // 
+            // buttonExportPrescriptionPdf
+            // 
+            buttonExportPrescriptionPdf.Location = new Point(21, 290);
+            buttonExportPrescriptionPdf.Name = "buttonExportPrescriptionPdf";
+            buttonExportPrescriptionPdf.Size = new Size(94, 29);
+            buttonExportPrescriptionPdf.TabIndex = 12;
+            buttonExportPrescriptionPdf.Text = "Export PDF";
+            buttonExportPrescriptionPdf.UseVisualStyleBackColor = true;
+            buttonExportPrescriptionPdf.Click += buttonExportPrescriptionPdf_Click;
             // 
             // FormDoctor
             // 
@@ -535,5 +555,6 @@
         private Label labelPrescriptionDate;
         private Label labelPrescriptionMedicine;
         private Label labelPrescriptionQuantity;
+        private Button buttonExportPrescriptionPdf;
     }
 }

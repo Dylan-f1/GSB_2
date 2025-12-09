@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using GSB_2.DAO;
 using GSB_2.Models;
+using GSB_2.Utils;  // ← AJOUTER CETTE LIGNE
 
 namespace GSB_2.Forms
 {
@@ -11,6 +13,8 @@ namespace GSB_2.Forms
         private readonly PatientDAO patientDAO;
         private readonly MedicineDAO medicineDAO;
         private readonly PrescriptionDAO prescriptionDAO;
+        private readonly AppartientDAO appartientDAO;  // ← AJOUTER CETTE LIGNE
+        private readonly UserDAO userDAO;  // ← AJOUTER CETTE LIGNE
         private int currentUserId;
         private bool userRole; // false = Doctor
 
@@ -23,6 +27,8 @@ namespace GSB_2.Forms
             patientDAO = new PatientDAO();
             medicineDAO = new MedicineDAO();
             prescriptionDAO = new PrescriptionDAO();
+            appartientDAO = new AppartientDAO();  // ← AJOUTER CETTE LIGNE
+            userDAO = new UserDAO();  // ← AJOUTER CETTE LIGNE
 
             LoadPatients();
             LoadMedicines();
@@ -276,12 +282,12 @@ namespace GSB_2.Forms
 
                 // Appeler createMedicine avec les paramètres individuels
                 bool success = medicineDAO.createMedicine(
-                    currentUserId,                               
-                    textBoxMedicineName.Text.Trim(),            
-                    textBoxMedicineDescription.Text.Trim(),     
-                    textBoxMedicineMolecule.Text.Trim(),       
-                    dosage,                                     
-                    userRole                                    
+                    currentUserId,
+                    textBoxMedicineName.Text.Trim(),
+                    textBoxMedicineDescription.Text.Trim(),
+                    textBoxMedicineMolecule.Text.Trim(),
+                    dosage,
+                    userRole
                 );
 
                 if (success)
@@ -377,6 +383,8 @@ namespace GSB_2.Forms
 
         // ==================== PRESCRIPTION ====================
 
+        // Remplace la méthode LoadPrescriptionsData dans FormDoctor.cs
+
         private void LoadPrescriptionsData()
         {
             try
@@ -402,11 +410,13 @@ namespace GSB_2.Forms
                     return;
                 }
 
+                // Créer une liste enrichie avec le nombre de médicaments
                 var displayList = prescriptionList.Select(p => new
                 {
                     Id = p.Id_prescription,
                     Id_Patient = p.Id_patient,
-                    Validité = p.Validity.ToString("dd/MM/yyyy")
+                    Validité = p.Validity.ToString("dd/MM/yyyy"),
+                    Nb_Médicaments = appartientDAO.getMedicineCountByPrescriptionId(p.Id_prescription)  // ← AJOUT
                 }).ToList();
 
                 dataGridViewPrescriptions.DataSource = displayList;
@@ -418,7 +428,6 @@ namespace GSB_2.Forms
                     "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void buttonPrescriptionAdd_Click(object sender, EventArgs e)
         {
             try
@@ -464,8 +473,7 @@ namespace GSB_2.Forms
                     // 2. Récupérer l'ID de la dernière prescription créée
                     int lastPrescriptionId = prescriptionDAO.getLastInsertedId();
 
-                    // 3. Ajouter le médicament à la prescription avec AppartientDAO
-                    AppartientDAO appartientDAO = new AppartientDAO();
+                    // 3. Ajouter le médicament à la prescription
                     bool medicineAdded = appartientDAO.addMedicineToPrescrition(
                         lastPrescriptionId,
                         (int)comboBoxMedicine.SelectedValue,
@@ -521,7 +529,6 @@ namespace GSB_2.Forms
                 if (result == DialogResult.Yes)
                 {
                     // 1. Supprimer tous les médicaments de la prescription
-                    AppartientDAO appartientDAO = new AppartientDAO();
                     appartientDAO.removeAllMedicinesFromPrescription(id);
 
                     // 2. Supprimer la prescription
@@ -548,6 +555,78 @@ namespace GSB_2.Forms
             }
         }
 
+        // ==================== EXPORT PDF ====================
+        // ← NOUVELLE MÉTHODE POUR EXPORTER EN PDF
+        private void buttonExportPrescriptionPdf_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Vérifier qu'une prescription est sélectionnée
+                if (dataGridViewPrescriptions.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show(
+                        "Veuillez sélectionner une prescription à exporter.",
+                        "Attention",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Récupérer l'ID de la prescription sélectionnée
+                int prescriptionId = Convert.ToInt32(
+                    dataGridViewPrescriptions.SelectedRows[0].Cells["Id"].Value);
+
+                // Récupérer la prescription
+                Prescription prescription = prescriptionDAO.getPrescriptionById(prescriptionId);
+                if (prescription == null)
+                {
+                    MessageBox.Show("Prescription introuvable.", "Erreur",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Récupérer le patient
+                Patient patient = patientDAO.GetPatientById(prescription.Id_patient);
+
+                // Récupérer le médecin
+                User doctor = userDAO.GetUserById(prescription.Id_user);
+
+                // Récupérer les médicaments avec leurs quantités
+                List<Medicine> medicines = appartientDAO.getMedicinesByPrescriptionId(prescriptionId);
+
+                // Vérifier qu'il y a des médicaments
+                if (medicines == null || medicines.Count == 0)
+                {
+                    MessageBox.Show(
+                        "Cette prescription ne contient aucun médicament.\n" +
+                        "Impossible d'exporter une prescription vide.",
+                        "Prescription vide",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Créer la liste de tuples (Medicine, quantity)
+                List<(Medicine, int)> medicinesWithQuantity = new List<(Medicine, int)>();
+                foreach (Medicine med in medicines)
+                {
+                    int quantity = appartientDAO.getMedicineQuantity(prescriptionId, med.Id_medicine);
+                    medicinesWithQuantity.Add((med, quantity));
+                }
+
+                // EXPORTER EN PDF
+                ExporterPDF.ExportPrescription(prescription, patient, doctor, medicinesWithQuantity);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Erreur lors de l'export :\n{ex.Message}",
+                    "Erreur",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
         private void buttonPrescriptionClear_Click(object sender, EventArgs e)
         {
             ClearPrescriptionFields();
@@ -565,7 +644,7 @@ namespace GSB_2.Forms
             dateTimePickerValidity.Value = DateTime.Now;
             dataGridViewPrescriptions.ClearSelection();
         }
-        
+
         // ==================== LOGOUT ====================
         private void buttonFormDoctorLogout_Click(object sender, EventArgs e)
         {

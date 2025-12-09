@@ -303,7 +303,6 @@ namespace GSB_2.DAO
             return prescriptions;
         }
 
-        // À ajouter dans PrescriptionDAO.cs
         public int getLastInsertedId()
         {
             using (var connection = db.GetConnection())
