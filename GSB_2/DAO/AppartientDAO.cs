@@ -21,7 +21,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"INSERT INTO appartient (id_prescription, id_medicine, quantity)
+                    myCommand.CommandText = @"INSERT INTO Appartient (id_prescription, id_medicine, quantity)
                                             VALUES (@id_prescription, @id_medicine, @quantity)";
 
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
@@ -50,7 +50,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"DELETE FROM appartient 
+                    myCommand.CommandText = @"DELETE FROM Appartient 
                                             WHERE id_prescription = @id_prescription 
                                             AND id_medicine = @id_medicine";
 
@@ -79,7 +79,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"UPDATE appartient 
+                    myCommand.CommandText = @"UPDATE Appartient 
                                             SET quantity = @quantity
                                             WHERE id_prescription = @id_prescription 
                                             AND id_medicine = @id_medicine";
@@ -110,7 +110,7 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"DELETE FROM appartient 
+                    myCommand.CommandText = @"DELETE FROM Appartient 
                                             WHERE id_prescription = @id_prescription";
 
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
@@ -141,7 +141,7 @@ namespace GSB_2.DAO
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT m.id_medicine, m.id_user, m.name, m.description, m.molecule, m.dosage, a.quantity
                                             FROM medicine m
-                                            INNER JOIN appartient a ON m.id_medicine = a.id_medicine
+                                            INNER JOIN Appartient a ON m.id_medicine = a.id_medicine
                                             WHERE a.id_prescription = @id_prescription";
 
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
@@ -185,7 +185,7 @@ namespace GSB_2.DAO
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT quantity 
-                                            FROM appartient 
+                                            FROM Appartient 
                                             WHERE id_prescription = @id_prescription 
                                             AND id_medicine = @id_medicine";
 
@@ -215,7 +215,7 @@ namespace GSB_2.DAO
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT COUNT(*) 
-                                            FROM appartient 
+                                            FROM Appartient 
                                             WHERE id_prescription = @id_prescription 
                                             AND id_medicine = @id_medicine";
 
@@ -245,7 +245,7 @@ namespace GSB_2.DAO
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT COUNT(*) 
-                                            FROM appartient 
+                                            FROM Appartient 
                                             WHERE id_prescription = @id_prescription";
 
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
@@ -272,7 +272,7 @@ namespace GSB_2.DAO
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
                     myCommand.CommandText = @"SELECT SUM(quantity) 
-                                            FROM appartient 
+                                            FROM Appartient 
                                             WHERE id_prescription = @id_prescription";
 
                     myCommand.Parameters.AddWithValue("@id_prescription", id_prescription);
