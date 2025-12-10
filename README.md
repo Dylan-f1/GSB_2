@@ -144,7 +144,3 @@ Pour une documentation technique détaillée incluant :
 - Contrôle d'accès basé sur les rôles
 - Validation des permissions avant chaque opération
 - Protection contre les injections SQL via paramètres
-
-## License
-
-Projet académique - GSB 2
