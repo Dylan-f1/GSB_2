@@ -56,6 +56,7 @@
             textBoxMedicineDosage = new TextBox();
             textBoxMedicineName = new TextBox();
             PrescriptionPage = new TabPage();
+            buttonExportPrescriptionPdf = new Button();
             labelPrescriptionQuantity = new Label();
             labelPrescriptionMedicine = new Label();
             labelPrescriptionDate = new Label();
@@ -68,8 +69,29 @@
             buttonPrescriptionAdd = new Button();
             dateTimePickerValidity = new DateTimePicker();
             comboBoxPatient = new ComboBox();
+            tabPageSearch = new TabPage();
+            groupBoxResults = new GroupBox();
+            dataGridViewSearchResults = new DataGridView();
+            groupBoxSearchCriteria = new GroupBox();
+            buttonClearSearch = new Button();
+            buttonSearch = new Button();
+            dateTimePickerEndDate = new DateTimePicker();
+            label4 = new Label();
+            dateTimePickerStartDate = new DateTimePicker();
+            label3 = new Label();
+            checkBoxUsePeriod = new CheckBox();
+            textBoxSearchValue = new TextBox();
+            comboBoxSearchMedicine = new ComboBox();
+            label2 = new Label();
+            comboBoxSearchType = new ComboBox();
+            label1 = new Label();
             buttonFormDoctorLogout = new Button();
-            buttonExportPrescriptionPdf = new Button();
+            groupBoxStatistics = new GroupBox();
+            labelStatsQuantity = new Label();
+            labelStatsPrescriptions = new Label();
+            labelStatsPatients = new Label();
+            buttonExportCSV = new Button();
+            buttonExportPDF = new Button();
             tabControlFormDoctor.SuspendLayout();
             PatientPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPatients).BeginInit();
@@ -77,6 +99,11 @@
             ((System.ComponentModel.ISupportInitialize)dataGridViewMedicines).BeginInit();
             PrescriptionPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).BeginInit();
+            tabPageSearch.SuspendLayout();
+            groupBoxResults.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewSearchResults).BeginInit();
+            groupBoxSearchCriteria.SuspendLayout();
+            groupBoxStatistics.SuspendLayout();
             SuspendLayout();
             // 
             // tabControlFormDoctor
@@ -84,6 +111,7 @@
             tabControlFormDoctor.Controls.Add(PatientPage);
             tabControlFormDoctor.Controls.Add(MedicinePage);
             tabControlFormDoctor.Controls.Add(PrescriptionPage);
+            tabControlFormDoctor.Controls.Add(tabPageSearch);
             tabControlFormDoctor.Location = new Point(2, 2);
             tabControlFormDoctor.Name = "tabControlFormDoctor";
             tabControlFormDoctor.SelectedIndex = 0;
@@ -364,6 +392,16 @@
             PrescriptionPage.Text = " Prescription";
             PrescriptionPage.UseVisualStyleBackColor = true;
             // 
+            // buttonExportPrescriptionPdf
+            // 
+            buttonExportPrescriptionPdf.Location = new Point(21, 290);
+            buttonExportPrescriptionPdf.Name = "buttonExportPrescriptionPdf";
+            buttonExportPrescriptionPdf.Size = new Size(94, 29);
+            buttonExportPrescriptionPdf.TabIndex = 12;
+            buttonExportPrescriptionPdf.Text = "Export PDF";
+            buttonExportPrescriptionPdf.UseVisualStyleBackColor = true;
+            buttonExportPrescriptionPdf.Click += buttonExportPrescriptionPdf_Click;
+            // 
             // labelPrescriptionQuantity
             // 
             labelPrescriptionQuantity.AutoSize = true;
@@ -469,6 +507,160 @@
             comboBoxPatient.Size = new Size(151, 28);
             comboBoxPatient.TabIndex = 0;
             // 
+            // tabPageSearch
+            // 
+            tabPageSearch.Controls.Add(groupBoxStatistics);
+            tabPageSearch.Controls.Add(groupBoxResults);
+            tabPageSearch.Controls.Add(groupBoxSearchCriteria);
+            tabPageSearch.Location = new Point(4, 29);
+            tabPageSearch.Name = "tabPageSearch";
+            tabPageSearch.Padding = new Padding(3);
+            tabPageSearch.Size = new Size(786, 415);
+            tabPageSearch.TabIndex = 3;
+            tabPageSearch.Text = "Search";
+            tabPageSearch.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxResults
+            // 
+            groupBoxResults.Controls.Add(dataGridViewSearchResults);
+            groupBoxResults.Location = new Point(367, 3);
+            groupBoxResults.Name = "groupBoxResults";
+            groupBoxResults.Size = new Size(423, 272);
+            groupBoxResults.TabIndex = 1;
+            groupBoxResults.TabStop = false;
+            // 
+            // dataGridViewSearchResults
+            // 
+            dataGridViewSearchResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewSearchResults.Dock = DockStyle.Fill;
+            dataGridViewSearchResults.Location = new Point(3, 23);
+            dataGridViewSearchResults.Name = "dataGridViewSearchResults";
+            dataGridViewSearchResults.RowHeadersWidth = 51;
+            dataGridViewSearchResults.Size = new Size(417, 246);
+            dataGridViewSearchResults.TabIndex = 0;
+            // 
+            // groupBoxSearchCriteria
+            // 
+            groupBoxSearchCriteria.Controls.Add(buttonClearSearch);
+            groupBoxSearchCriteria.Controls.Add(buttonSearch);
+            groupBoxSearchCriteria.Controls.Add(dateTimePickerEndDate);
+            groupBoxSearchCriteria.Controls.Add(label4);
+            groupBoxSearchCriteria.Controls.Add(dateTimePickerStartDate);
+            groupBoxSearchCriteria.Controls.Add(label3);
+            groupBoxSearchCriteria.Controls.Add(checkBoxUsePeriod);
+            groupBoxSearchCriteria.Controls.Add(textBoxSearchValue);
+            groupBoxSearchCriteria.Controls.Add(comboBoxSearchMedicine);
+            groupBoxSearchCriteria.Controls.Add(label2);
+            groupBoxSearchCriteria.Controls.Add(comboBoxSearchType);
+            groupBoxSearchCriteria.Controls.Add(label1);
+            groupBoxSearchCriteria.Location = new Point(6, 6);
+            groupBoxSearchCriteria.Name = "groupBoxSearchCriteria";
+            groupBoxSearchCriteria.Size = new Size(352, 395);
+            groupBoxSearchCriteria.TabIndex = 0;
+            groupBoxSearchCriteria.TabStop = false;
+            // 
+            // buttonClearSearch
+            // 
+            buttonClearSearch.Location = new Point(190, 350);
+            buttonClearSearch.Name = "buttonClearSearch";
+            buttonClearSearch.Size = new Size(94, 29);
+            buttonClearSearch.TabIndex = 11;
+            buttonClearSearch.Text = "Clear";
+            buttonClearSearch.UseVisualStyleBackColor = true;
+            // 
+            // buttonSearch
+            // 
+            buttonSearch.Location = new Point(29, 350);
+            buttonSearch.Name = "buttonSearch";
+            buttonSearch.Size = new Size(94, 29);
+            buttonSearch.TabIndex = 10;
+            buttonSearch.Text = "Search";
+            buttonSearch.UseVisualStyleBackColor = true;
+            // 
+            // dateTimePickerEndDate
+            // 
+            dateTimePickerEndDate.Location = new Point(15, 287);
+            dateTimePickerEndDate.Name = "dateTimePickerEndDate";
+            dateTimePickerEndDate.Size = new Size(220, 27);
+            dateTimePickerEndDate.TabIndex = 9;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(15, 264);
+            label4.Name = "label4";
+            label4.Size = new Size(34, 20);
+            label4.TabIndex = 8;
+            label4.Text = "Au :";
+            // 
+            // dateTimePickerStartDate
+            // 
+            dateTimePickerStartDate.Location = new Point(15, 234);
+            dateTimePickerStartDate.Name = "dateTimePickerStartDate";
+            dateTimePickerStartDate.Size = new Size(220, 27);
+            dateTimePickerStartDate.TabIndex = 7;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(15, 211);
+            label3.Name = "label3";
+            label3.Size = new Size(35, 20);
+            label3.TabIndex = 6;
+            label3.Text = "Du :";
+            // 
+            // checkBoxUsePeriod
+            // 
+            checkBoxUsePeriod.AutoSize = true;
+            checkBoxUsePeriod.Location = new Point(15, 184);
+            checkBoxUsePeriod.Name = "checkBoxUsePeriod";
+            checkBoxUsePeriod.Size = new Size(151, 24);
+            checkBoxUsePeriod.TabIndex = 5;
+            checkBoxUsePeriod.Text = "Filtrer par période";
+            checkBoxUsePeriod.UseVisualStyleBackColor = true;
+            // 
+            // textBoxSearchValue
+            // 
+            textBoxSearchValue.Location = new Point(202, 132);
+            textBoxSearchValue.Name = "textBoxSearchValue";
+            textBoxSearchValue.Size = new Size(125, 27);
+            textBoxSearchValue.TabIndex = 4;
+            // 
+            // comboBoxSearchMedicine
+            // 
+            comboBoxSearchMedicine.FormattingEnabled = true;
+            comboBoxSearchMedicine.Location = new Point(15, 132);
+            comboBoxSearchMedicine.Name = "comboBoxSearchMedicine";
+            comboBoxSearchMedicine.Size = new Size(151, 28);
+            comboBoxSearchMedicine.TabIndex = 3;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(15, 109);
+            label2.Name = "label2";
+            label2.Size = new Size(89, 20);
+            label2.TabIndex = 2;
+            label2.Text = "Rechercher :";
+            // 
+            // comboBoxSearchType
+            // 
+            comboBoxSearchType.FormattingEnabled = true;
+            comboBoxSearchType.Items.AddRange(new object[] { "Par Médicament", "Par Molécule", "Par Nom Médicament" });
+            comboBoxSearchType.Location = new Point(15, 51);
+            comboBoxSearchType.Name = "comboBoxSearchType";
+            comboBoxSearchType.Size = new Size(151, 28);
+            comboBoxSearchType.TabIndex = 1;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(15, 28);
+            label1.Name = "label1";
+            label1.Size = new Size(136, 20);
+            label1.TabIndex = 0;
+            label1.Text = "Type de recherche :";
+            // 
             // buttonFormDoctorLogout
             // 
             buttonFormDoctorLogout.Location = new Point(702, 2);
@@ -479,15 +671,63 @@
             buttonFormDoctorLogout.UseVisualStyleBackColor = true;
             buttonFormDoctorLogout.Click += buttonFormDoctorLogout_Click;
             // 
-            // buttonExportPrescriptionPdf
+            // groupBoxStatistics
             // 
-            buttonExportPrescriptionPdf.Location = new Point(21, 290);
-            buttonExportPrescriptionPdf.Name = "buttonExportPrescriptionPdf";
-            buttonExportPrescriptionPdf.Size = new Size(94, 29);
-            buttonExportPrescriptionPdf.TabIndex = 12;
-            buttonExportPrescriptionPdf.Text = "Export PDF";
-            buttonExportPrescriptionPdf.UseVisualStyleBackColor = true;
-            buttonExportPrescriptionPdf.Click += buttonExportPrescriptionPdf_Click;
+            groupBoxStatistics.Controls.Add(buttonExportPDF);
+            groupBoxStatistics.Controls.Add(buttonExportCSV);
+            groupBoxStatistics.Controls.Add(labelStatsPatients);
+            groupBoxStatistics.Controls.Add(labelStatsPrescriptions);
+            groupBoxStatistics.Controls.Add(labelStatsQuantity);
+            groupBoxStatistics.Location = new Point(370, 293);
+            groupBoxStatistics.Name = "groupBoxStatistics";
+            groupBoxStatistics.Size = new Size(416, 119);
+            groupBoxStatistics.TabIndex = 2;
+            groupBoxStatistics.TabStop = false;
+            // 
+            // labelStatsQuantity
+            // 
+            labelStatsQuantity.AutoSize = true;
+            labelStatsQuantity.Location = new Point(271, 23);
+            labelStatsQuantity.Name = "labelStatsQuantity";
+            labelStatsQuantity.Size = new Size(128, 20);
+            labelStatsQuantity.TabIndex = 0;
+            labelStatsQuantity.Text = "Quantité totale : 0";
+            // 
+            // labelStatsPrescriptions
+            // 
+            labelStatsPrescriptions.AutoSize = true;
+            labelStatsPrescriptions.Location = new Point(118, 23);
+            labelStatsPrescriptions.Name = "labelStatsPrescriptions";
+            labelStatsPrescriptions.Size = new Size(112, 20);
+            labelStatsPrescriptions.TabIndex = 1;
+            labelStatsPrescriptions.Text = "Prescriptions : 0";
+            // 
+            // labelStatsPatients
+            // 
+            labelStatsPatients.AutoSize = true;
+            labelStatsPatients.Location = new Point(23, 23);
+            labelStatsPatients.Name = "labelStatsPatients";
+            labelStatsPatients.Size = new Size(79, 20);
+            labelStatsPatients.TabIndex = 2;
+            labelStatsPatients.Text = "Patients : 0";
+            // 
+            // buttonExportCSV
+            // 
+            buttonExportCSV.Location = new Point(42, 79);
+            buttonExportCSV.Name = "buttonExportCSV";
+            buttonExportCSV.Size = new Size(110, 29);
+            buttonExportCSV.TabIndex = 3;
+            buttonExportCSV.Text = "Exporter CSV";
+            buttonExportCSV.UseVisualStyleBackColor = true;
+            // 
+            // buttonExportPDF
+            // 
+            buttonExportPDF.Location = new Point(250, 79);
+            buttonExportPDF.Name = "buttonExportPDF";
+            buttonExportPDF.Size = new Size(112, 29);
+            buttonExportPDF.TabIndex = 4;
+            buttonExportPDF.Text = "Exporter PDF";
+            buttonExportPDF.UseVisualStyleBackColor = true;
             // 
             // FormDoctor
             // 
@@ -508,6 +748,13 @@
             PrescriptionPage.ResumeLayout(false);
             PrescriptionPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).EndInit();
+            tabPageSearch.ResumeLayout(false);
+            groupBoxResults.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridViewSearchResults).EndInit();
+            groupBoxSearchCriteria.ResumeLayout(false);
+            groupBoxSearchCriteria.PerformLayout();
+            groupBoxStatistics.ResumeLayout(false);
+            groupBoxStatistics.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -556,5 +803,27 @@
         private Label labelPrescriptionMedicine;
         private Label labelPrescriptionQuantity;
         private Button buttonExportPrescriptionPdf;
+        private TabPage tabPageSearch;
+        private GroupBox groupBoxSearchCriteria;
+        private Label label1;
+        private ComboBox comboBoxSearchType;
+        private Label label2;
+        private ComboBox comboBoxSearchMedicine;
+        private TextBox textBoxSearchValue;
+        private CheckBox checkBoxUsePeriod;
+        private Label label3;
+        private DateTimePicker dateTimePickerStartDate;
+        private Label label4;
+        private DateTimePicker dateTimePickerEndDate;
+        private Button buttonSearch;
+        private Button buttonClearSearch;
+        private GroupBox groupBoxResults;
+        private DataGridView dataGridViewSearchResults;
+        private GroupBox groupBoxStatistics;
+        private Label labelStatsQuantity;
+        private Label labelStatsPrescriptions;
+        private Label labelStatsPatients;
+        private Button buttonExportCSV;
+        private Button buttonExportPDF;
     }
 }
