@@ -70,6 +70,12 @@
             dateTimePickerValidity = new DateTimePicker();
             comboBoxPatient = new ComboBox();
             tabPageSearch = new TabPage();
+            groupBoxStatistics = new GroupBox();
+            buttonExportPDF = new Button();
+            buttonExportCSV = new Button();
+            labelStatsPatients = new Label();
+            labelStatsPrescriptions = new Label();
+            labelStatsQuantity = new Label();
             groupBoxResults = new GroupBox();
             dataGridViewSearchResults = new DataGridView();
             groupBoxSearchCriteria = new GroupBox();
@@ -86,12 +92,6 @@
             comboBoxSearchType = new ComboBox();
             label1 = new Label();
             buttonFormDoctorLogout = new Button();
-            groupBoxStatistics = new GroupBox();
-            labelStatsQuantity = new Label();
-            labelStatsPrescriptions = new Label();
-            labelStatsPatients = new Label();
-            buttonExportCSV = new Button();
-            buttonExportPDF = new Button();
             tabControlFormDoctor.SuspendLayout();
             PatientPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPatients).BeginInit();
@@ -100,10 +100,10 @@
             PrescriptionPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).BeginInit();
             tabPageSearch.SuspendLayout();
+            groupBoxStatistics.SuspendLayout();
             groupBoxResults.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewSearchResults).BeginInit();
             groupBoxSearchCriteria.SuspendLayout();
-            groupBoxStatistics.SuspendLayout();
             SuspendLayout();
             // 
             // tabControlFormDoctor
@@ -394,7 +394,7 @@
             // 
             // buttonExportPrescriptionPdf
             // 
-            buttonExportPrescriptionPdf.Location = new Point(21, 290);
+            buttonExportPrescriptionPdf.Location = new Point(241, 349);
             buttonExportPrescriptionPdf.Name = "buttonExportPrescriptionPdf";
             buttonExportPrescriptionPdf.Size = new Size(94, 29);
             buttonExportPrescriptionPdf.TabIndex = 12;
@@ -455,16 +455,16 @@
             // 
             // dataGridViewPrescriptions
             // 
-            dataGridViewPrescriptions.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewPrescriptions.Location = new Point(426, 26);
+            dataGridViewPrescriptions.ColumnHeadersHeight = 29;
+            dataGridViewPrescriptions.Location = new Point(400, 0);
             dataGridViewPrescriptions.Name = "dataGridViewPrescriptions";
             dataGridViewPrescriptions.RowHeadersWidth = 51;
-            dataGridViewPrescriptions.Size = new Size(345, 364);
+            dataGridViewPrescriptions.Size = new Size(386, 415);
             dataGridViewPrescriptions.TabIndex = 5;
             // 
             // buttonPrescriptionClear
             // 
-            buttonPrescriptionClear.Location = new Point(298, 39);
+            buttonPrescriptionClear.Location = new Point(322, 7);
             buttonPrescriptionClear.Name = "buttonPrescriptionClear";
             buttonPrescriptionClear.Size = new Size(72, 29);
             buttonPrescriptionClear.TabIndex = 4;
@@ -474,7 +474,7 @@
             // 
             // buttonPrescriptionDelete
             // 
-            buttonPrescriptionDelete.Location = new Point(133, 349);
+            buttonPrescriptionDelete.Location = new Point(129, 349);
             buttonPrescriptionDelete.Name = "buttonPrescriptionDelete";
             buttonPrescriptionDelete.Size = new Size(94, 29);
             buttonPrescriptionDelete.TabIndex = 3;
@@ -519,6 +519,64 @@
             tabPageSearch.TabIndex = 3;
             tabPageSearch.Text = "Search";
             tabPageSearch.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxStatistics
+            // 
+            groupBoxStatistics.Controls.Add(buttonExportPDF);
+            groupBoxStatistics.Controls.Add(buttonExportCSV);
+            groupBoxStatistics.Controls.Add(labelStatsPatients);
+            groupBoxStatistics.Controls.Add(labelStatsPrescriptions);
+            groupBoxStatistics.Controls.Add(labelStatsQuantity);
+            groupBoxStatistics.Location = new Point(370, 293);
+            groupBoxStatistics.Name = "groupBoxStatistics";
+            groupBoxStatistics.Size = new Size(416, 119);
+            groupBoxStatistics.TabIndex = 2;
+            groupBoxStatistics.TabStop = false;
+            // 
+            // buttonExportPDF
+            // 
+            buttonExportPDF.Location = new Point(250, 79);
+            buttonExportPDF.Name = "buttonExportPDF";
+            buttonExportPDF.Size = new Size(112, 29);
+            buttonExportPDF.TabIndex = 4;
+            buttonExportPDF.Text = "Exporter PDF";
+            buttonExportPDF.UseVisualStyleBackColor = true;
+            // 
+            // buttonExportCSV
+            // 
+            buttonExportCSV.Location = new Point(42, 79);
+            buttonExportCSV.Name = "buttonExportCSV";
+            buttonExportCSV.Size = new Size(110, 29);
+            buttonExportCSV.TabIndex = 3;
+            buttonExportCSV.Text = "Exporter CSV";
+            buttonExportCSV.UseVisualStyleBackColor = true;
+            // 
+            // labelStatsPatients
+            // 
+            labelStatsPatients.AutoSize = true;
+            labelStatsPatients.Location = new Point(23, 23);
+            labelStatsPatients.Name = "labelStatsPatients";
+            labelStatsPatients.Size = new Size(79, 20);
+            labelStatsPatients.TabIndex = 2;
+            labelStatsPatients.Text = "Patients : 0";
+            // 
+            // labelStatsPrescriptions
+            // 
+            labelStatsPrescriptions.AutoSize = true;
+            labelStatsPrescriptions.Location = new Point(118, 23);
+            labelStatsPrescriptions.Name = "labelStatsPrescriptions";
+            labelStatsPrescriptions.Size = new Size(112, 20);
+            labelStatsPrescriptions.TabIndex = 1;
+            labelStatsPrescriptions.Text = "Prescriptions : 0";
+            // 
+            // labelStatsQuantity
+            // 
+            labelStatsQuantity.AutoSize = true;
+            labelStatsQuantity.Location = new Point(271, 23);
+            labelStatsQuantity.Name = "labelStatsQuantity";
+            labelStatsQuantity.Size = new Size(128, 20);
+            labelStatsQuantity.TabIndex = 0;
+            labelStatsQuantity.Text = "Quantité totale : 0";
             // 
             // groupBoxResults
             // 
@@ -671,64 +729,6 @@
             buttonFormDoctorLogout.UseVisualStyleBackColor = true;
             buttonFormDoctorLogout.Click += buttonFormDoctorLogout_Click;
             // 
-            // groupBoxStatistics
-            // 
-            groupBoxStatistics.Controls.Add(buttonExportPDF);
-            groupBoxStatistics.Controls.Add(buttonExportCSV);
-            groupBoxStatistics.Controls.Add(labelStatsPatients);
-            groupBoxStatistics.Controls.Add(labelStatsPrescriptions);
-            groupBoxStatistics.Controls.Add(labelStatsQuantity);
-            groupBoxStatistics.Location = new Point(370, 293);
-            groupBoxStatistics.Name = "groupBoxStatistics";
-            groupBoxStatistics.Size = new Size(416, 119);
-            groupBoxStatistics.TabIndex = 2;
-            groupBoxStatistics.TabStop = false;
-            // 
-            // labelStatsQuantity
-            // 
-            labelStatsQuantity.AutoSize = true;
-            labelStatsQuantity.Location = new Point(271, 23);
-            labelStatsQuantity.Name = "labelStatsQuantity";
-            labelStatsQuantity.Size = new Size(128, 20);
-            labelStatsQuantity.TabIndex = 0;
-            labelStatsQuantity.Text = "Quantité totale : 0";
-            // 
-            // labelStatsPrescriptions
-            // 
-            labelStatsPrescriptions.AutoSize = true;
-            labelStatsPrescriptions.Location = new Point(118, 23);
-            labelStatsPrescriptions.Name = "labelStatsPrescriptions";
-            labelStatsPrescriptions.Size = new Size(112, 20);
-            labelStatsPrescriptions.TabIndex = 1;
-            labelStatsPrescriptions.Text = "Prescriptions : 0";
-            // 
-            // labelStatsPatients
-            // 
-            labelStatsPatients.AutoSize = true;
-            labelStatsPatients.Location = new Point(23, 23);
-            labelStatsPatients.Name = "labelStatsPatients";
-            labelStatsPatients.Size = new Size(79, 20);
-            labelStatsPatients.TabIndex = 2;
-            labelStatsPatients.Text = "Patients : 0";
-            // 
-            // buttonExportCSV
-            // 
-            buttonExportCSV.Location = new Point(42, 79);
-            buttonExportCSV.Name = "buttonExportCSV";
-            buttonExportCSV.Size = new Size(110, 29);
-            buttonExportCSV.TabIndex = 3;
-            buttonExportCSV.Text = "Exporter CSV";
-            buttonExportCSV.UseVisualStyleBackColor = true;
-            // 
-            // buttonExportPDF
-            // 
-            buttonExportPDF.Location = new Point(250, 79);
-            buttonExportPDF.Name = "buttonExportPDF";
-            buttonExportPDF.Size = new Size(112, 29);
-            buttonExportPDF.TabIndex = 4;
-            buttonExportPDF.Text = "Exporter PDF";
-            buttonExportPDF.UseVisualStyleBackColor = true;
-            // 
             // FormDoctor
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -749,12 +749,12 @@
             PrescriptionPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).EndInit();
             tabPageSearch.ResumeLayout(false);
+            groupBoxStatistics.ResumeLayout(false);
+            groupBoxStatistics.PerformLayout();
             groupBoxResults.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewSearchResults).EndInit();
             groupBoxSearchCriteria.ResumeLayout(false);
             groupBoxSearchCriteria.PerformLayout();
-            groupBoxStatistics.ResumeLayout(false);
-            groupBoxStatistics.PerformLayout();
             ResumeLayout(false);
         }
 
