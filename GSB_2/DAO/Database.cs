@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MySql.Data;
-using GSB_2.DAO;
-using GSB_2.Models;
+﻿using System.Configuration;
 using MySql.Data.MySqlClient;
 
 namespace GSB2.DAO
 {
-   public class Database
+    public class Database
     {
+        private readonly string myConnectionString =
+            ConfigurationManager.ConnectionStrings["GSB2"].ConnectionString;
 
-      private readonly string myConnectionString = "server=localhost;uid=root;pwd=rootpassword;database=GSB2";
-
-      public MySqlConnection GetConnection()
-      {
-        return new MySqlConnection(myConnectionString);
-      }
+        public MySqlConnection GetConnection()
+        {
+            return new MySqlConnection(myConnectionString);
+        }
     }
 }
