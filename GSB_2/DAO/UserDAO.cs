@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using GSB2.DAO;
 using MySql.Data.MySqlClient;
@@ -14,7 +12,7 @@ namespace GSB_2.DAO
     {
         private readonly Database db = new Database();
 
-        // Login - Connexion d'un utilisateur
+        // Login - Connexion d'un utilisateur avec migration SHA-256 → BCrypt transparente
         public User Login(string email, string password)
         {
             using (var connection = db.GetConnection())
@@ -23,30 +21,71 @@ namespace GSB_2.DAO
                 {
                     connection.Open();
 
-                    MySqlCommand myCommand = new MySqlCommand();
-                    myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT * FROM Users WHERE email = @email AND password = SHA2(@password, 256)";
+                    // 1. Récupérer l'utilisateur avec son hash et son flag de migration
+                    MySqlCommand fetchCmd = new MySqlCommand(
+                        "SELECT id_user, firstname, name, role, password, is_migrated FROM Users WHERE email = @email",
+                        connection);
+                    fetchCmd.Parameters.AddWithValue("@email", email);
 
-                    myCommand.Parameters.AddWithValue("@email", email);
-                    myCommand.Parameters.AddWithValue("@password", password);
+                    int userId;
+                    string firstname, name, storedHash;
+                    bool role;
+                    bool isMigrated;
 
-                    using (MySqlDataReader myReader = myCommand.ExecuteReader())
+                    using (MySqlDataReader reader = fetchCmd.ExecuteReader())
                     {
-                        if (myReader.Read())
-                        {
-                            int id = myReader.GetInt32("id_user");
-                            string firstname = myReader.GetString("firstname");
-                            string name = myReader.GetString("name");
-                            bool role = myReader.GetBoolean("role");
-
-                            return new User(id, firstname, name, email, password, role);
-                        }
-                        else
+                        if (!reader.Read())
                         {
                             MessageBox.Show("Aucun utilisateur trouvé avec ces identifiants.", "Information");
                             return null;
                         }
+
+                        userId     = reader.GetInt32("id_user");
+                        firstname  = reader.GetString("firstname");
+                        name       = reader.GetString("name");
+                        role       = reader.GetBoolean("role");
+                        storedHash = reader.GetString("password");
+                        isMigrated = reader.GetInt32("is_migrated") == 1;
                     }
+
+                    // 2. Vérification selon l'état de migration
+                    bool passwordOk = false;
+
+                    if (!isMigrated)
+                    {
+                        // Vérification SHA-256 (comportement actuel)
+                        string sha256 = Convert.ToHexString(
+                            SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(password))
+                        ).ToLower();
+
+                        if (sha256 == storedHash)
+                        {
+                            passwordOk = true;
+
+                            // Rehachage en BCrypt (work factor 12) + mise à jour en base
+                            string bcryptHash = BCrypt.Net.BCrypt.HashPassword(password, 12);
+
+                            MySqlCommand updateCmd = new MySqlCommand(
+                                "UPDATE Users SET password = @hash, is_migrated = 1 WHERE id_user = @id",
+                                connection);
+                            updateCmd.Parameters.AddWithValue("@hash", bcryptHash);
+                            updateCmd.Parameters.AddWithValue("@id", userId);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        // Vérification BCrypt
+                        passwordOk = BCrypt.Net.BCrypt.Verify(password, storedHash);
+                    }
+
+                    if (!passwordOk)
+                    {
+                        MessageBox.Show("Aucun utilisateur trouvé avec ces identifiants.", "Information");
+                        return null;
+                    }
+
+                    return new User(userId, firstname, name, email, password, role);
                 }
                 catch (Exception ex)
                 {
