@@ -417,7 +417,8 @@ namespace GSB_2.Forms
                     Id = p.Id_prescription,
                     Id_Patient = p.Id_patient,
                     Validité = p.Validity.ToString("dd/MM/yyyy"),
-                    Nb_Médicaments = appartientDAO.getMedicineCountByPrescriptionId(p.Id_prescription)
+                    Nb_Médicaments = appartientDAO.getMedicineCountByPrescriptionId(p.Id_prescription),
+                    Statut = p.Statut
                 }).ToList();
 
                 dataGridViewPrescriptions.DataSource = displayList;
@@ -983,6 +984,39 @@ namespace GSB_2.Forms
                 MainForm loginForm = new MainForm();
                 loginForm.Show();
             }
+        }
+
+        // Mission 1: CellFormatting est déclenché à chaque fois que la grille dessine une cellule
+        private void dataGridViewPrescriptions_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            // on ignore les en-têtes de colonnes (RowIndex = -1)
+            if (e.RowIndex < 0) return;
+
+            // on lit la valeur de la colonne Statut sur la ligne en cours
+            // le ?. protège contre le null, évite une exception si la cellule est vide
+            string statut = dataGridViewPrescriptions.Rows[e.RowIndex].Cells["Statut"].Value?.ToString();
+
+            // on change la couleur de fond de la ligne selon le statut
+            if (statut == "Valide")
+                dataGridViewPrescriptions.Rows[e.RowIndex].DefaultCellStyle.BackColor = System.Drawing.Color.LightGreen;
+            else if (statut == "Expire bientôt")
+                dataGridViewPrescriptions.Rows[e.RowIndex].DefaultCellStyle.BackColor = System.Drawing.Color.Orange;
+            else if (statut == "Expirée")
+                dataGridViewPrescriptions.Rows[e.RowIndex].DefaultCellStyle.BackColor = System.Drawing.Color.LightCoral;
+        }
+
+        // Mission 3: déclenché quand l'utilisateur double-clique sur une ligne de la grille
+        private void dataGridViewPrescriptions_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // on ignore les en-têtes de colonnes
+            if (e.RowIndex < 0) return;
+
+            // on récupère l'ID de la prescription sur la ligne cliquée
+            int prescriptionId = Convert.ToInt32(dataGridViewPrescriptions.Rows[e.RowIndex].Cells["Id"].Value);
+
+            // on ouvre le formulaire de détail en modal (ShowDialog bloque FormDoctor tant que la fenêtre est ouverte)
+            FormDetailPrescription formDetail = new FormDetailPrescription(prescriptionId);
+            formDetail.ShowDialog(this);
         }
     }
 }

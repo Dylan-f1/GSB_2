@@ -461,6 +461,8 @@
             dataGridViewPrescriptions.RowHeadersWidth = 51;
             dataGridViewPrescriptions.Size = new Size(386, 415);
             dataGridViewPrescriptions.TabIndex = 5;
+            dataGridViewPrescriptions.CellDoubleClick += dataGridViewPrescriptions_CellDoubleClick;
+            dataGridViewPrescriptions.CellFormatting += dataGridViewPrescriptions_CellFormatting;
             // 
             // buttonPrescriptionClear
             // 
@@ -540,6 +542,7 @@
             buttonExportPDF.Size = new Size(112, 29);
             buttonExportPDF.TabIndex = 4;
             buttonExportPDF.Text = "Exporter PDF";
+            buttonExportPDF.Click += buttonExportPDF_Click;
             buttonExportPDF.UseVisualStyleBackColor = true;
             // 
             // buttonExportCSV
@@ -549,6 +552,7 @@
             buttonExportCSV.Size = new Size(110, 29);
             buttonExportCSV.TabIndex = 3;
             buttonExportCSV.Text = "Exporter CSV";
+            buttonExportCSV.Click += buttonExportCSV_Click;
             buttonExportCSV.UseVisualStyleBackColor = true;
             // 
             // labelStatsPatients
@@ -624,6 +628,7 @@
             buttonClearSearch.Size = new Size(94, 29);
             buttonClearSearch.TabIndex = 11;
             buttonClearSearch.Text = "Clear";
+            buttonClearSearch.Click += buttonClearSearch_Click;
             buttonClearSearch.UseVisualStyleBackColor = true;
             // 
             // buttonSearch
@@ -633,6 +638,7 @@
             buttonSearch.Size = new Size(94, 29);
             buttonSearch.TabIndex = 10;
             buttonSearch.Text = "Search";
+            buttonSearch.Click += buttonSearch_Click;
             buttonSearch.UseVisualStyleBackColor = true;
             // 
             // dateTimePickerEndDate
@@ -676,6 +682,7 @@
             checkBoxUsePeriod.TabIndex = 5;
             checkBoxUsePeriod.Text = "Filtrer par période";
             checkBoxUsePeriod.UseVisualStyleBackColor = true;
+            checkBoxUsePeriod.CheckedChanged += checkBoxUsePeriod_CheckedChanged;
             // 
             // textBoxSearchValue
             // 
@@ -709,6 +716,7 @@
             comboBoxSearchType.Name = "comboBoxSearchType";
             comboBoxSearchType.Size = new Size(151, 28);
             comboBoxSearchType.TabIndex = 1;
+            comboBoxSearchType.SelectedIndexChanged += comboBoxSearchType_SelectedIndexChanged;
             // 
             // label1
             // 

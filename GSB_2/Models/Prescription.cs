@@ -15,6 +15,21 @@ namespace GSB_2.Models
         public int Id_patient { get; set; }
         public DateTime Validity { get; set; }
 
+        // propriété calculée : pas de set car on ne stocke pas le statut en base, il est calculé à partir de Validity
+        public string Statut
+        {
+            get
+            {
+                // on soustrait la date du jour à la date de validité pour avoir le nombre de jours restants
+                int joursRestants = (Validity.Date - DateTime.Now.Date).Days;
+                if (joursRestants < 0)      // date dépassée
+                    return "Expirée";
+                if (joursRestants <= 7)     // moins d'une semaine restante
+                    return "Expire bientôt";
+                return "Valide";            // tout va bien
+            }
+        }
+
         //ceci est le constructeur par défaut,
         //il permet de créer l'instance qui nous permettra d'accéder
         //aux méthodes et propriétés de la classe
