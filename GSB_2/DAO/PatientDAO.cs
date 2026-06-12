@@ -14,7 +14,7 @@ namespace GSB_2.DAO
         private readonly Database db = new Database();
 
         // Créer un nouveau patient
-        public bool createPatient(int id_user, string name, int age, string firstname, string gender, bool userRole)
+        public bool createPatient(int id_user, string name, int age, string firstname, string gender, int? id_regime, bool userRole)
         {
             if (userRole) return false; // Si True (1) alors interdit
 
@@ -26,14 +26,16 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"INSERT INTO Patients (id_user, name, age, firstname, gender)
-                                            VALUES (@id_user, @name, @age, @firstname, @gender)";
+                    myCommand.CommandText = @"INSERT INTO Patients (id_user, name, age, firstname, gender, id_regime)
+                                            VALUES (@id_user, @name, @age, @firstname, @gender, @id_regime)";
 
                     myCommand.Parameters.AddWithValue("@id_user", id_user);
                     myCommand.Parameters.AddWithValue("@name", name);
                     myCommand.Parameters.AddWithValue("@age", age);
                     myCommand.Parameters.AddWithValue("@firstname", firstname);
                     myCommand.Parameters.AddWithValue("@gender", gender);
+                    // Si id_regime est null (aucun régime), on insère DBNull.Value → NULL en base
+                    myCommand.Parameters.AddWithValue("@id_regime", (object)id_regime ?? DBNull.Value);
 
                     myCommand.ExecuteNonQuery();
                     return true;
@@ -126,8 +128,12 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT id_patient, id_user, name, firstname, age, gender 
-                                            FROM Patients";
+                    // LEFT JOIN pour récupérer le libellé du régime en une seule requête
+                    // LEFT JOIN et non INNER JOIN : les patients sans régime (id_regime NULL) restent dans la liste
+                    myCommand.CommandText = @"SELECT p.id_patient, p.id_user, p.name, p.firstname, p.age, p.gender,
+                                                     p.id_regime, r.label AS regime_label
+                                            FROM Patients p
+                                            LEFT JOIN Regimes r ON p.id_regime = r.id_regime";
 
                     using (MySqlDataReader reader = myCommand.ExecuteReader())
                     {
@@ -139,7 +145,10 @@ namespace GSB_2.DAO
                                 reader.GetString("name"),
                                 reader.GetString("firstname"),
                                 reader.GetInt32("age"),
-                                reader.GetString("gender")
+                                reader.GetString("gender"),
+                                // IsDBNull vérifie si id_regime est NULL en base (patient sans régime)
+                                reader.IsDBNull(reader.GetOrdinal("id_regime")) ? (int?)null : reader.GetInt32("id_regime"),
+                                reader.IsDBNull(reader.GetOrdinal("regime_label")) ? null : reader.GetString("regime_label")
                             );
                             patients.Add(patient);
                         }
@@ -165,9 +174,12 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT id_patient, id_user, name, firstname, age, gender 
-                                            FROM Patients 
-                                            WHERE id_patient = @id_patient";
+                    // LEFT JOIN pour récupérer le libellé du régime en une seule requête
+                    myCommand.CommandText = @"SELECT p.id_patient, p.id_user, p.name, p.firstname, p.age, p.gender,
+                                                     p.id_regime, r.label AS regime_label
+                                            FROM Patients p
+                                            LEFT JOIN Regimes r ON p.id_regime = r.id_regime
+                                            WHERE p.id_patient = @id_patient";
 
                     myCommand.Parameters.AddWithValue("@id_patient", id_patient);
 
@@ -181,7 +193,9 @@ namespace GSB_2.DAO
                                 reader.GetString("name"),
                                 reader.GetString("firstname"),
                                 reader.GetInt32("age"),
-                                reader.GetString("gender")
+                                reader.GetString("gender"),
+                                reader.IsDBNull(reader.GetOrdinal("id_regime")) ? (int?)null : reader.GetInt32("id_regime"),
+                                reader.IsDBNull(reader.GetOrdinal("regime_label")) ? null : reader.GetString("regime_label")
                             );
                         }
                     }
@@ -208,9 +222,12 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT id_patient, id_user, name, firstname, age, gender 
-                                            FROM Patients 
-                                            WHERE name LIKE @name";
+                    // LEFT JOIN pour récupérer le libellé du régime en une seule requête
+                    myCommand.CommandText = @"SELECT p.id_patient, p.id_user, p.name, p.firstname, p.age, p.gender,
+                                                     p.id_regime, r.label AS regime_label
+                                            FROM Patients p
+                                            LEFT JOIN Regimes r ON p.id_regime = r.id_regime
+                                            WHERE p.name LIKE @name";
 
                     myCommand.Parameters.AddWithValue("@name", "%" + name + "%");
 
@@ -224,7 +241,9 @@ namespace GSB_2.DAO
                                 reader.GetString("name"),
                                 reader.GetString("firstname"),
                                 reader.GetInt32("age"),
-                                reader.GetString("gender")
+                                reader.GetString("gender"),
+                                reader.IsDBNull(reader.GetOrdinal("id_regime")) ? (int?)null : reader.GetInt32("id_regime"),
+                                reader.IsDBNull(reader.GetOrdinal("regime_label")) ? null : reader.GetString("regime_label")
                             );
                             patients.Add(patient);
                         }
@@ -252,9 +271,12 @@ namespace GSB_2.DAO
 
                     MySqlCommand myCommand = new MySqlCommand();
                     myCommand.Connection = connection;
-                    myCommand.CommandText = @"SELECT id_patient, id_user, name, firstname, age, gender 
-                                            FROM Patients 
-                                            WHERE id_user = @id_user";
+                    // LEFT JOIN pour récupérer le libellé du régime en une seule requête
+                    myCommand.CommandText = @"SELECT p.id_patient, p.id_user, p.name, p.firstname, p.age, p.gender,
+                                                     p.id_regime, r.label AS regime_label
+                                            FROM Patients p
+                                            LEFT JOIN Regimes r ON p.id_regime = r.id_regime
+                                            WHERE p.id_user = @id_user";
 
                     myCommand.Parameters.AddWithValue("@id_user", id_user);
 
@@ -268,7 +290,9 @@ namespace GSB_2.DAO
                                 reader.GetString("name"),
                                 reader.GetString("firstname"),
                                 reader.GetInt32("age"),
-                                reader.GetString("gender")
+                                reader.GetString("gender"),
+                                reader.IsDBNull(reader.GetOrdinal("id_regime")) ? (int?)null : reader.GetInt32("id_regime"),
+                                reader.IsDBNull(reader.GetOrdinal("regime_label")) ? null : reader.GetString("regime_label")
                             );
                             patients.Add(patient);
                         }
@@ -277,6 +301,56 @@ namespace GSB_2.DAO
                 catch (Exception ex)
                 {
                     Console.WriteLine("Erreur lors de la récupération des patients : " + ex.Message);
+                }
+            }
+
+            return patients;
+        }
+
+        // Récupérer les patients ayant un régime alimentaire spécifique
+        // INNER JOIN (et non LEFT JOIN) : on veut uniquement les patients qui ont ce régime
+        // La requête est paramétrée : @id_regime protège contre les injections SQL
+        public List<Patient> getPatientsByRegime(int id_regime)
+        {
+            List<Patient> patients = new List<Patient>();
+
+            using (var connection = db.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+
+                    MySqlCommand myCommand = new MySqlCommand();
+                    myCommand.Connection = connection;
+                    myCommand.CommandText = @"SELECT p.id_patient, p.id_user, p.name, p.firstname, p.age, p.gender,
+                                                     p.id_regime, r.label AS regime_label
+                                            FROM Patients p
+                                            INNER JOIN Regimes r ON p.id_regime = r.id_regime
+                                            WHERE p.id_regime = @id_regime";
+
+                    myCommand.Parameters.AddWithValue("@id_regime", id_regime);
+
+                    using (MySqlDataReader reader = myCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Patient patient = new Patient(
+                                reader.GetInt32("id_patient"),
+                                reader.GetInt32("id_user"),
+                                reader.GetString("name"),
+                                reader.GetString("firstname"),
+                                reader.GetInt32("age"),
+                                reader.GetString("gender"),
+                                reader.GetInt32("id_regime"),
+                                reader.GetString("regime_label")
+                            );
+                            patients.Add(patient);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la récupération des patients par régime : " + ex.Message);
                 }
             }
 

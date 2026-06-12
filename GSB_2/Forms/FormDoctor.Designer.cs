@@ -41,6 +41,8 @@
             textBoxPatientAge = new TextBox();
             textBoxPatientName = new TextBox();
             textBoxPatientFirstname = new TextBox();
+            labelPatientRegime = new Label();
+            comboBoxPatientRegime = new ComboBox();
             dataGridViewPatients = new DataGridView();
             MedicinePage = new TabPage();
             labelMedicineMolecule = new Label();
@@ -70,6 +72,11 @@
             dateTimePickerValidity = new DateTimePicker();
             comboBoxPatient = new ComboBox();
             tabPageSearch = new TabPage();
+            tabPageRegime = new TabPage();
+            labelRegimeFilter = new Label();
+            comboBoxRegimeFilter = new ComboBox();
+            labelRegimeCount = new Label();
+            dataGridViewRegimePatients = new DataGridView();
             groupBoxStatistics = new GroupBox();
             buttonExportPDF = new Button();
             buttonExportCSV = new Button();
@@ -100,6 +107,8 @@
             PrescriptionPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).BeginInit();
             tabPageSearch.SuspendLayout();
+            tabPageRegime.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewRegimePatients).BeginInit();
             groupBoxStatistics.SuspendLayout();
             groupBoxResults.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewSearchResults).BeginInit();
@@ -112,6 +121,7 @@
             tabControlFormDoctor.Controls.Add(MedicinePage);
             tabControlFormDoctor.Controls.Add(PrescriptionPage);
             tabControlFormDoctor.Controls.Add(tabPageSearch);
+            tabControlFormDoctor.Controls.Add(tabPageRegime);
             tabControlFormDoctor.Location = new Point(2, 2);
             tabControlFormDoctor.Name = "tabControlFormDoctor";
             tabControlFormDoctor.SelectedIndex = 0;
@@ -131,6 +141,8 @@
             PatientPage.Controls.Add(textBoxPatientAge);
             PatientPage.Controls.Add(textBoxPatientName);
             PatientPage.Controls.Add(textBoxPatientFirstname);
+            PatientPage.Controls.Add(labelPatientRegime);
+            PatientPage.Controls.Add(comboBoxPatientRegime);
             PatientPage.Controls.Add(dataGridViewPatients);
             PatientPage.Location = new Point(4, 29);
             PatientPage.Name = "PatientPage";
@@ -235,8 +247,26 @@
             textBoxPatientFirstname.Size = new Size(145, 27);
             textBoxPatientFirstname.TabIndex = 1;
             // 
+            // labelPatientRegime
+            //
+            labelPatientRegime.AutoSize = true;
+            labelPatientRegime.Location = new Point(33, 255);
+            labelPatientRegime.Name = "labelPatientRegime";
+            labelPatientRegime.Size = new Size(68, 20);
+            labelPatientRegime.TabIndex = 12;
+            labelPatientRegime.Text = "Régime :";
+            //
+            // comboBoxPatientRegime
+            //
+            comboBoxPatientRegime.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxPatientRegime.FormattingEnabled = true;
+            comboBoxPatientRegime.Location = new Point(33, 278);
+            comboBoxPatientRegime.Name = "comboBoxPatientRegime";
+            comboBoxPatientRegime.Size = new Size(220, 28);
+            comboBoxPatientRegime.TabIndex = 13;
+            //
             // dataGridViewPatients
-            // 
+            //
             dataGridViewPatients.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewPatients.Location = new Point(330, 17);
             dataGridViewPatients.Name = "dataGridViewPatients";
@@ -728,9 +758,61 @@
             buttonFormDoctorLogout.Text = "Logout";
             buttonFormDoctorLogout.UseVisualStyleBackColor = true;
             buttonFormDoctorLogout.Click += buttonFormDoctorLogout_Click;
-            // 
+            //
+            // tabPageRegime
+            //
+            tabPageRegime.Controls.Add(labelRegimeFilter);
+            tabPageRegime.Controls.Add(comboBoxRegimeFilter);
+            tabPageRegime.Controls.Add(labelRegimeCount);
+            tabPageRegime.Controls.Add(dataGridViewRegimePatients);
+            tabPageRegime.Location = new Point(4, 29);
+            tabPageRegime.Name = "tabPageRegime";
+            tabPageRegime.Padding = new Padding(3);
+            tabPageRegime.Size = new Size(786, 415);
+            tabPageRegime.TabIndex = 4;
+            tabPageRegime.Text = "Régime";
+            tabPageRegime.UseVisualStyleBackColor = true;
+            //
+            // labelRegimeFilter
+            //
+            labelRegimeFilter.AutoSize = true;
+            labelRegimeFilter.Location = new Point(17, 20);
+            labelRegimeFilter.Name = "labelRegimeFilter";
+            labelRegimeFilter.Size = new Size(130, 20);
+            labelRegimeFilter.TabIndex = 0;
+            labelRegimeFilter.Text = "Régime alimentaire :";
+            //
+            // comboBoxRegimeFilter
+            //
+            comboBoxRegimeFilter.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxRegimeFilter.FormattingEnabled = true;
+            comboBoxRegimeFilter.Location = new Point(160, 17);
+            comboBoxRegimeFilter.Name = "comboBoxRegimeFilter";
+            comboBoxRegimeFilter.Size = new Size(200, 28);
+            comboBoxRegimeFilter.TabIndex = 1;
+            comboBoxRegimeFilter.SelectedIndexChanged += comboBoxRegimeFilter_SelectedIndexChanged;
+            //
+            // labelRegimeCount
+            //
+            labelRegimeCount.AutoSize = true;
+            labelRegimeCount.Location = new Point(380, 20);
+            labelRegimeCount.Name = "labelRegimeCount";
+            labelRegimeCount.Size = new Size(0, 20);
+            labelRegimeCount.TabIndex = 2;
+            labelRegimeCount.Text = "";
+            //
+            // dataGridViewRegimePatients
+            //
+            dataGridViewRegimePatients.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewRegimePatients.Location = new Point(17, 55);
+            dataGridViewRegimePatients.Name = "dataGridViewRegimePatients";
+            dataGridViewRegimePatients.ReadOnly = true;
+            dataGridViewRegimePatients.RowHeadersWidth = 51;
+            dataGridViewRegimePatients.Size = new Size(752, 345);
+            dataGridViewRegimePatients.TabIndex = 3;
+            //
             // FormDoctor
-            // 
+            //
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
@@ -749,6 +831,9 @@
             PrescriptionPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPrescriptions).EndInit();
             tabPageSearch.ResumeLayout(false);
+            tabPageRegime.ResumeLayout(false);
+            tabPageRegime.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewRegimePatients).EndInit();
             groupBoxStatistics.ResumeLayout(false);
             groupBoxStatistics.PerformLayout();
             groupBoxResults.ResumeLayout(false);
@@ -759,6 +844,11 @@
         }
 
         #endregion
+        private TabPage tabPageRegime;
+        private Label labelRegimeFilter;
+        private ComboBox comboBoxRegimeFilter;
+        private Label labelRegimeCount;
+        private DataGridView dataGridViewRegimePatients;
         private Panel SidePanel;
         private Button buttonPatientAdd;
         private Button BtnPrescriptions;
@@ -775,6 +865,8 @@
         private Label labelPatientAge;
         private ComboBox comboBoxPatientGender;
         private Label labelPatientGender;
+        private Label labelPatientRegime;
+        private ComboBox comboBoxPatientRegime;
         private Button buttonPatientDelete;
         private Button buttonPatientClear;
         private Button buttonFormDoctorLogout;

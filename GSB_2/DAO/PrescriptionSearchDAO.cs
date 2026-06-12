@@ -423,7 +423,9 @@ namespace GSB_2.DAO
                                 reader.GetString("name"),
                                 reader.GetString("firstname"),
                                 reader.GetInt32("age"),
-                                reader.GetString("gender")
+                                reader.GetString("gender"),
+                                null,   // id_regime non nécessaire dans ce contexte de recherche
+                                null    // regime_label non nécessaire dans ce contexte de recherche
                             );
                             patients.Add(patient);
                         }

@@ -16,6 +16,11 @@ namespace GSB_2.Models
         public string Firstname { get; set; }
         public int Age { get; set; }
         public string Gender { get; set; }
+        // int? (nullable) car un patient peut ne pas avoir de régime alimentaire
+        public int? Id_regime { get; set; }
+        // Libellé du régime récupéré par jointure dans le DAO (ex: "Diabétique")
+        // null si le patient n'a pas de régime
+        public string RegimeLabel { get; set; }
 
         //ceci est le constructeur par défaut,
         //il permet de créer l'instance qui nous permettra d'accéder
@@ -24,7 +29,7 @@ namespace GSB_2.Models
 
         //ceci est une surcharge du constructeur, elle permettra la création d'objet Patient
         // ceci sera instancié avec les variables passées en paramètres
-        public Patient(int id_patient, int id_user, string name, string firstname, int age, string gender)
+        public Patient(int id_patient, int id_user, string name, string firstname, int age, string gender, int? id_regime, string regimeLabel)
         {
             this.Id_patient = id_patient;
             this.Id_user = id_user;
@@ -32,6 +37,8 @@ namespace GSB_2.Models
             this.Firstname = firstname;
             this.Age = age;
             this.Gender = gender;
+            this.Id_regime = id_regime;
+            this.RegimeLabel = regimeLabel;
         }
     }
 }

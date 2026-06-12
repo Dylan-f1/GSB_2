@@ -16,6 +16,7 @@ namespace GSB_2.Forms
         private readonly AppartientDAO appartientDAO;
         private readonly UserDAO userDAO;
         private readonly PrescriptionSearchDAO searchDAO;  // ← NOUVEAU
+        private readonly RegimeDAO regimeDAO;
         private int currentUserId;
         private bool userRole; // false = Doctor
 
@@ -34,15 +35,45 @@ namespace GSB_2.Forms
             appartientDAO = new AppartientDAO();
             userDAO = new UserDAO();
             searchDAO = new PrescriptionSearchDAO();  // ← NOUVEAU
+            regimeDAO = new RegimeDAO();
 
             LoadPatients();
+            LoadRegimes();
             LoadMedicines();
             LoadPrescriptionsData();
             InitializeSearchTab();  // ← NOUVEAU
+            LoadRegimeTab();
         }
 
         // ==================== PATIENT ====================
-        // [... Garder tout le code existant pour Patient ...]
+
+        // Charge la liste des régimes depuis la base et alimente la ComboBox de saisie
+        // Un item "Aucun" est inséré en première position (valeur 0) pour les patients sans régime
+        private void LoadRegimes()
+        {
+            try
+            {
+                var regimeList = regimeDAO.GetAll();
+
+                // On insère un item "Aucun" en tête de liste pour représenter l'absence de régime
+                // Id_regime = 0 sera converti en NULL lors de l'INSERT en base
+                regimeList.Insert(0, new Regime(0, "Aucun"));
+
+                // DisplayMember et ValueMember doivent être définis AVANT DataSource
+                // Sinon SelectedValue retourne l'objet Regime entier au lieu de l'int
+                // DisplayMember : ce que l'utilisateur voit dans la liste déroulante
+                comboBoxPatientRegime.DisplayMember = "Label";
+                // ValueMember : ce que le code récupère via SelectedValue (l'id, pas le texte)
+                comboBoxPatientRegime.ValueMember = "Id_regime";
+                comboBoxPatientRegime.DataSource = regimeList;
+                comboBoxPatientRegime.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des régimes: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void LoadPatients()
         {
@@ -62,7 +93,9 @@ namespace GSB_2.Forms
                     Nom = p.Name,
                     Prénom = p.Firstname,
                     Age = p.Age,
-                    Genre = p.Gender
+                    Genre = p.Gender,
+                    // ?? "Aucun" : affiche "Aucun" si le patient n'a pas de régime (RegimeLabel est null)
+                    Régime = p.RegimeLabel ?? "Aucun"
                 }).ToList();
 
                 dataGridViewPatients.DataSource = displayList;
@@ -115,12 +148,18 @@ namespace GSB_2.Forms
                     return;
                 }
 
+                // Récupération du régime sélectionné
+                // Si l'utilisateur a choisi "Aucun" (id=0), on passe null → NULL en base
+                int selectedIdRegime = (int)comboBoxPatientRegime.SelectedValue;
+                int? idRegime = selectedIdRegime == 0 ? (int?)null : selectedIdRegime;
+
                 bool success = patientDAO.createPatient(
                     currentUserId,
                     textBoxPatientName.Text.Trim(),
                     age,
                     textBoxPatientFirstname.Text.Trim(),
                     comboBoxPatientGender.SelectedItem.ToString(),
+                    idRegime,
                     userRole
                 );
 
@@ -201,6 +240,9 @@ namespace GSB_2.Forms
             textBoxPatientAge.Clear();
             if (comboBoxPatientGender.Items.Count > 0)
                 comboBoxPatientGender.SelectedIndex = 0;
+            // Remet la ComboBox régime sur "Aucun" (index 0)
+            if (comboBoxPatientRegime.Items.Count > 0)
+                comboBoxPatientRegime.SelectedIndex = 0;
             dataGridViewPatients.ClearSelection();
         }
 
@@ -218,6 +260,88 @@ namespace GSB_2.Forms
                 {
                     comboBoxPatientGender.SelectedItem = gender;
                 }
+
+                // Positionne la ComboBox sur le régime du patient sélectionné
+                // Si le patient n'a pas de régime ("Aucun"), on revient à l'index 0
+                string regimeLabel = row.Cells["Régime"].Value?.ToString() ?? "Aucun";
+                foreach (Regime r in comboBoxPatientRegime.Items)
+                {
+                    if (r.Label == regimeLabel)
+                    {
+                        comboBoxPatientRegime.SelectedItem = r;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // ==================== RÉGIME ====================
+
+        // Charge la ComboBox de l'onglet Régime avec la liste des régimes depuis la base
+        // Pas d'item "Aucun" ici : on filtre par régime, donc on veut uniquement les régimes réels
+        private void LoadRegimeTab()
+        {
+            try
+            {
+                var regimeList = regimeDAO.GetAll();
+
+                // DisplayMember et ValueMember doivent être définis AVANT DataSource
+                // Sinon SelectedIndexChanged se déclenche avant que ValueMember soit pris en compte
+                // et SelectedValue retourne l'objet Regime entier au lieu de l'int
+                comboBoxRegimeFilter.DisplayMember = "Label";
+                comboBoxRegimeFilter.ValueMember = "Id_regime";
+                comboBoxRegimeFilter.DataSource = regimeList;
+
+                // Déclencher manuellement l'affichage pour le premier régime de la liste
+                if (regimeList.Count > 0)
+                    LoadPatientsByRegime(regimeList[0].Id_regime);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des régimes: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Déclenché à chaque changement de sélection dans la ComboBox de filtre
+        private void comboBoxRegimeFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxRegimeFilter.SelectedValue != null)
+                LoadPatientsByRegime((int)comboBoxRegimeFilter.SelectedValue);
+        }
+
+        // Charge dans la grille les patients ayant le régime sélectionné
+        private void LoadPatientsByRegime(int idRegime)
+        {
+            try
+            {
+                var patientList = patientDAO.getPatientsByRegime(idRegime);
+
+                if (patientList == null || patientList.Count == 0)
+                {
+                    dataGridViewRegimePatients.DataSource = null;
+                    labelRegimeCount.Text = "Aucun patient pour ce régime.";
+                    return;
+                }
+
+                var displayList = patientList.Select(p => new
+                {
+                    Id = p.Id_patient,
+                    Nom = p.Name,
+                    Prénom = p.Firstname,
+                    Age = p.Age,
+                    Genre = p.Gender
+                }).ToList();
+
+                dataGridViewRegimePatients.DataSource = displayList;
+                dataGridViewRegimePatients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                // Affiche le nombre de patients trouvés pour ce régime
+                labelRegimeCount.Text = $"{patientList.Count} patient(s) trouvé(s)";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des patients: {ex.Message}",
+                    "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
